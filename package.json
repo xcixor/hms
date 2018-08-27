@@ -1,0 +1,30 @@
+{
+  "name": "hms_app",
+  "version": "1.0.0",
+  "description": "An app to automate manual processes in a hotel",
+  "main": "main.js",
+  "scripts": {
+    "start": "node_modules/.bin/electron .",
+    "test": "node_modules/.bin/mocha test/tests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xcixor/hms.git"
+  },
+  "keywords": [
+    "hotel management system",
+    "electron app"
+  ],
+  "author": "pndungu54@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xcixor/hms/issues"
+  },
+  "homepage": "https://github.com/xcixor/hms#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "electron": "^2.0.8",
+    "mocha": "^5.2.0",
+    "spectron": "^3.8.0"
+  }
+}
