@@ -1,0 +1,21 @@
+body,
+html {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.main-splash {
+    flex: 1 0 auto;
+    height: 130px;
+    margin-top: 20px;
+}
+
+.bottom {
+    flex-shrink: 0;
+    /* height: 40px; */
+}
