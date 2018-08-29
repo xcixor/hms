@@ -16,48 +16,20 @@ const Menu = electron.Menu;
 // set the environment
 process.env.NODE_ENV = 'development';
 
-let mainWindow;
-let splashWindow;
+let splashWindow = require('./splashWindow');
 
-function createSplashScreen() {
-    splashWindow = new BrowserWindow({
-        show: false,
-        width: 320,
-        height: 240,
-        frame: false,
-        resizable: false,
-        backgroundColor: '#FFF',
-        alwaysOnTop: true,
-    });
-    splashWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'app/templates/splash.html'),
-        protocol: 'file',
-        slashes: true
-    }));
-    splashWindow.on('closed', () => {
-        splashWindow = null;
-    });
-    splashWindow.once('ready-to-show', () => {
-        splashWindow.show();
-    });
-}
+let mainWindow = require('./mainWindow');
 
-function createWindow(fileString, options) {
+function createWindow(screen) {
     // create the browser window
-    let win = new BrowserWindow(options);
+    let win = new BrowserWindow(screen.options);
 
     // laod index page
     win.loadURL(url.format({
-        pathname: path.join(__dirname, fileString),
+        pathname: path.join(__dirname, screen.fileString),
         protocol: 'file',
         slashes: true
     }));
-
-    // open dev tools
-    // win.webContents.openDevTools();
-
-    // wait for 'ready-to-show' to display the window
-    // helps to prevent rendering inconsistency
 
     win.once('ready-to-show', () => {
         win.show();
@@ -79,12 +51,9 @@ ipc.on('get-version', event => {
     event.sender.send('set-version', app.getVersion());
 });
 
-// load main window
-// app.on('ready', createSplashScreen);
+// load splash screen
 app.on('ready', () => {
-    createSplashScreen();
-    const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+    splashWindow = createWindow(splashWindow);
 });
 
 app.on('window-all-closed', () => {
@@ -104,15 +73,9 @@ ipc.on('app-init', () => {
 
         }, -500);
     }
-    mainWindow = createWindow('app/templates/index.html', {
-        show: false,
-        title: 'Hotel Management System',
-        backgroundColor: "#fff",
-        width: 1200,
-        height: 900,
-        resizable: true,
-        icon: __dirname + '/app/assets/icons/icon.png'
-    });
+    mainWindow = createWindow(mainWindow);
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
 });
 
 // create the menu template
