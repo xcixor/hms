@@ -1,0 +1,31 @@
+os:
+  - linux
+
+language: node_js
+
+node_js:
+  - '10.8.0'
+
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+
+script:
+  - node --version
+  - npm --version
+  - npm install
+  - npm run e2e
+
+branches:
+  only:
+    - 160145646-continouos-integration-badges
+
+cache:
+  directories:
+    - node_modules
+
+notifications:
+  email:
+    on_success: never
+    on_failure: change
