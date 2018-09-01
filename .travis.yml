@@ -6,11 +6,10 @@ language: node_js
 node_js:
   - '10.8.0'
 
-script: ./scripts/travis-build.sh
+before_install:
+  - chmod +x ./scripts/travis-build.sh
 
-branches:
-  only:
-    - 160145646-continouos-integration-badges
+script: ./scripts/travis-build.sh
 
 cache:
   directories:
