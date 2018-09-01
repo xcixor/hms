@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node_modules/.bin/electron .",
     "test": "node_modules/.bin/mocha test/front.test.js",
-    "test-with-coverage": "nyc --reporter=text mocha"
+    "travis": "npm run && npm test"
   },
   "repository": {
     "type": "git",
