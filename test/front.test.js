@@ -6,7 +6,7 @@ const expect = require('chai').expect;
 const sleep = time => new Promise(r => setTimeout(r, time));
 
 describe('Test Splash Screen', function () {
-    this.timeout(5000);
+    this.timeout(6000);
     global.app = null;
 
     // stand up/ set up
@@ -59,7 +59,7 @@ describe('Test Splash Screen', function () {
         return app.client.waitUntilWindowLoaded(8000)
             .browserWindow.getBounds()
             .then(res => {
-                expect(res.width).to.equal(325);
+                expect(res.width).to.equal(320);
                 expect(res.height).to.equal(240);
             });
     });
