@@ -5,8 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "node_modules/.bin/electron .",
-    "test": "node_modules/.bin/mocha test/front.test.js",
-    "travis": "npm run && npm test"
+    "test": "node_modules/.bin/mocha test/front.test.js"
   },
   "repository": {
     "type": "git",
