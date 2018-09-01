@@ -6,7 +6,7 @@ const expect = require('chai').expect;
 const sleep = time => new Promise(r => setTimeout(r, time));
 
 describe('Test Splash Screen', function () {
-    this.timeout(5000);
+    this.timeout(6000);
     global.app = null;
 
     // stand up/ set up
