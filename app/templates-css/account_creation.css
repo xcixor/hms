@@ -1,0 +1,15 @@
+nav {
+    height: 100px;
+    line-height: 100px;
+}
+.container {
+    margin-top: 100px;
+}
+.col {
+    height: 100%;
+    margin-bottom: 20px;
+}
+
+.btn {
+    width: 100%;
+}
