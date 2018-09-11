@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link type="text/css" rel="stylesheet" href="../materialize/materialize.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="../templates-css/admin_dashboard.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="../font-awesome/css/all.css" />
+</head>
+
+<body>
+    <div class="content">
+    <nav>
+        <div class="nav-wrapper  blue darken-4">
+            <a class="brand-logo center">Admin Dashboard</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            user with accounts will appeare here with some details
+        </div>
+        <div class="side-menu">
+        <ul id="slide-out" class="sidenav sidenav-fixed">
+            <li>
+                <div class="user-view">
+                    <div class="background">
+                        <img src="images/office.jpg">
+                    </div>
+                    <a href="#user"><img class="circle" src="../assets/user_images/back6.jpeg"></a>
+                    <a href="#name"><span class="black-text name">Admin</span></a>
+                    <a href="#email"><span class="black-text email">jdandturk@gmail.com</span></a>
+                </div>
+            </li>
+            <li><a class="subheader">Account Actions</a></li>
+            <li><a href="#!" id="createAccountBtn">Create New Account</a></li>
+            <li><a href="#!">View an account details</a></li>
+            <li><a href="#!">Update an Account</a></li>
+            <li><a href="#!">Delete an Account</a></li>
+            <li>
+                <div class="divider"></div>
+            </li>
+            <li><a class="subheader">AOB</a></li>
+            <li><a class="waves-effect" href="#!">Some AOB</a></li>
+        </ul>
+        </div>
+    </div>
+    </div>
+    <script>
+        require('../../renderers/adminRenderer.js');
+    </script>
+    <script type="text/javascript" src="../materialize/materialize.js"></script>
+    <script type="text/javascript" src="../templates_js/admin_dashboard.js"></script>
+</body>
+
+</html>

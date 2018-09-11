@@ -19,6 +19,12 @@ let splashWindow = require('./app/windows/splashWindow');
 
 let mainWindow = require('./app/windows/mainWindow');
 
+let adminLogin = require('./app/windows/adminLogin');
+
+let adminDashboard = require('./app/windows/adminDashboard');
+
+let accountWindow = require('./app/windows/userCreation');
+
 function createWindow(screen) {
     // create the browser window
     let win = new BrowserWindow(screen.options);
@@ -43,6 +49,14 @@ function createWindow(screen) {
     });
     // console.log('webContents', webContents.getAllWebContents());
     return win;
+}
+function changeView(currentScreen, newScreen){
+    currentScreen.loadURL(url.format({
+        pathname: path.join(__dirname, newScreen.fileString),
+        protocol: 'file',
+        slashes: true
+    }));
+    currentScreen.setTitle(newScreen.options.title);
 }
 
 // Request app version number
@@ -80,4 +94,38 @@ ipc.on('app-init', () => {
 ipc.on('show-context-menu', function (event) {
     const win = BrowserWindow.fromWebContents(event.sender);
     contextMenu.popup(win);
+});
+
+ipc.on('pop-up-admin-window', ()=> {
+    if (adminLogin instanceof BrowserWindow){
+        adminLogin = require('./app/windows/adminLogin');
+        adminLogin.options.parent = mainWindow;
+        adminLogin = createWindow(adminLogin);
+    }else {
+        adminLogin.options.parent = mainWindow;
+        adminLogin = createWindow(adminLogin);
+    }
+});
+
+ipc.on('close-admin-login-window', ()=> {
+    adminLogin.close();
+});
+
+ipc.on('admin-login', function(event, args){
+    // event.sender.send('admin-login-success', 'Welcome' + args[0]);
+    // event.returnValue = 'admin-login-success Welcome' + args[0];
+    if(args[0] === 'admin'){
+        adminLogin.close();
+        changeView(mainWindow, adminDashboard);
+        event.returnValue = 'success';
+    }else{
+        event.returnValue = 'sth';
+    }
+    // setTimeout(()=>{
+    //     adminLogin.close();
+    // }, 500);
+});
+
+ipc.on('open-create-account-window', ()=>{
+    changeView(mainWindow, accountWindow);
 });
