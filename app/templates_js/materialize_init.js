@@ -1,19 +1,23 @@
-document.addEventListener('DOMContentLoaded', function () {
-    var elems = document.querySelectorAll('.sidenav');
-    var instances = M.Sidenav.init(elems, options);
+// initalize modals
+$(document).ready(function() {
+    $('.modal').modal();
 });
 
-// document.addEventListener('DOMContentLoaded', function () {
-//     var elems = document.querySelectorAll('select');
-//     var instances = M.FormSelect.init(elems, options);
-//     elems.material_select();
-// });
+// initialize select
+$(document).ready(function () {
+    $('select').formSelect();
+});
 
-// initialize the materialize select
-// $(document).ready(function () {
-//     $('select').material_select();
-// });
+// initialize date picker
+$(document).ready(function () {
+    $('.datepicker').datepicker();
+    var options = {
+        maxDate: new Date(),
+        format: 'yyyy-mm-dd',
+        yearRange: 50,
 
-// $(document).ready(function () {
-//     $('select').formSelect();
-// });
+    };
+    var elems = document.querySelectorAll('.datepicker');
+    var instance = M.Datepicker.init(elems, options);
+    instance.toString();
+});

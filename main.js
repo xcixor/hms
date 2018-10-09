@@ -1,4 +1,6 @@
-// const {app, BrowserWindow} = require('electron');
+// set the environment
+process.env.NODE_ENV = 'dev';
+
 const electron = require('electron');
 // module to control application life
 const app = electron.app;
@@ -8,12 +10,28 @@ const BrowserWindow = electron.BrowserWindow;
 const ipc = electron.ipcMain;
 
 const path = require('path');
+
 const url = require('url');
 
 const contextMenu = require('./app/windows/maincontextmenu');
 
-// set the environment
-process.env.NODE_ENV = 'development';
+
+const api = require('./api/api');
+
+// const express = require('express');
+
+// const bodyParser = require('body-parser');
+
+// const mongoose = require('mongoose');
+
+// const morgan = require('morgan');
+
+// const config = require('config');
+
+// const api = express();
+
+
+const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 
 let splashWindow = require('./app/windows/splashWindow');
 
@@ -24,6 +42,35 @@ let adminLogin = require('./app/windows/adminLogin');
 let adminDashboard = require('./app/windows/adminDashboard');
 
 let accountWindow = require('./app/windows/userCreation');
+
+let hrWindow = require('./app/windows/hrWindow');
+
+// // connect to mongodb
+// mongoose.connect(config.DBHost);
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'connection error'));
+
+// //don't show the log when it is test
+// if (config.util.getEnv('NODE_ENV') !== 'test') {
+//     //use morgan to log at command line
+//     api.use(morgan('combined')); //'combined' outputs the Apache style LOGs
+// }
+
+// mongoose.Promise = global.Promise;
+
+// api.use(bodyParser.json());
+
+// // initialize routes
+// api.use('/api', require('./api/routes/router'));
+
+// // listen for requests
+// api.listen(config.Port || 8000, () => {
+//     console.log('Environment ' + process.env);
+//     console.log('Listening for requests on port ' + config.Port + '.....');
+// });
+
+// // for testing
+// module.exports = api;
 
 function createWindow(screen) {
     // create the browser window
@@ -94,6 +141,7 @@ ipc.on('app-init', () => {
 ipc.on('show-context-menu', function (event) {
     const win = BrowserWindow.fromWebContents(event.sender);
     contextMenu.popup(win);
+    // contextMenu.getMenuItemById()
 });
 
 ipc.on('pop-up-admin-window', ()=> {
@@ -112,8 +160,6 @@ ipc.on('close-admin-login-window', ()=> {
 });
 
 ipc.on('admin-login', function(event, args){
-    // event.sender.send('admin-login-success', 'Welcome' + args[0]);
-    // event.returnValue = 'admin-login-success Welcome' + args[0];
     if(args[0] === 'admin'){
         adminLogin.close();
         changeView(mainWindow, adminDashboard);
@@ -121,11 +167,49 @@ ipc.on('admin-login', function(event, args){
     }else{
         event.returnValue = 'sth';
     }
-    // setTimeout(()=>{
-    //     adminLogin.close();
-    // }, 500);
 });
 
 ipc.on('open-create-account-window', ()=>{
     changeView(mainWindow, accountWindow);
+});
+
+ipc.on('user-login', (event, args)=>{
+    changeView(mainWindow, hrWindow);
+    event.returnValue = 'success';
+});
+
+ipc.on('create-user', (event, args)=>{
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/employees';
+    xhr.open('POST', url, true);
+    xhr.onreadystatechange = function () {
+        //Call a function when the state changes.
+        if (this.readyState == XMLHttpRequest.DONE || this.status == 200 || this.status == 400 || this.status == 409 || this.status == 409) {
+            event.returnValue = JSON.parse(this.responseText);
+        } else {
+            console.log(this.responseText);
+        }
+    };
+    //Send the proper header information along with the request
+    xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+    xhr.send(JSON.stringify(args));
+});
+
+function loadEmployees(callback){
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/employees';
+    xhr.addEventListener("load", ()=>{
+        var data = JSON.parse(xhr.responseText);
+        callback(data);
+    });
+    xhr.open('GET', url);
+    xhr.send();
+}
+
+ipc.on('retrieve-employees', (event, args)=>{
+    loadEmployees((data)=>{
+        setTimeout(() => {
+            mainWindow.send('receive-employees', data);
+        }, 1000);
+    });
 });

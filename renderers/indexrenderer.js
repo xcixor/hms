@@ -13,3 +13,9 @@ const loginPop = document.getElementById('loginPop');
 loginPop.addEventListener('click', ()=> {
     ipc.send('pop-up-admin-window');
 });
+
+const loginBtn = document.getElementById('loginBtn');
+loginBtn.addEventListener('click', ()=>{
+    ipc.sendSync('user-login');
+    ipc.send('retrieve-employees');
+});
