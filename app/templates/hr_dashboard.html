@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <link type="text/css" rel="stylesheet" href="../../node_modules/materialize-css/dist/css/materialize.css" media="screen,projection" />
     <link type="text/css" rel="stylesheet" href="../templates-css/hr_dashboard.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="../font-awesome/css/all.css" />
 </head>
-
 <body>
     <div class="content">
         <nav>
@@ -13,11 +12,30 @@
                 <a class="brand-logo center">HR Dashboard</a>
             </div>
         </nav>
-        <div class="container">
+        <div class="container" id="main-content">
             <div class="row employees" id="employees">
                <div class="row">
                    <h5 class="center">Employees Currently Registered</h5>
                </div>
+            <!-- <div class="container center" id="searchContainer">
+                <div class="row" id="searchRow">
+                    <div class="col m2"></div>
+                    <div class="col m8">
+                        <nav>
+                            <div class="nav-wrapper">
+                                <form>
+                                    <div class="input-field" id="searchInputField">
+                                        <input id="search" type="search" required>
+                                        <label class="label-icon" for="search"><i class="fa fa-search"></i></label>
+                                        <i class="material-icons fa fa-times-circle"></i>
+                                    </div>
+                                </form>
+                            </div>
+                        </nav>
+                    </div>
+                    <div class="col m2"></div>
+                </div>
+            </div> -->
             </div>
             <div class="row departments">
                 <p id="sentMessage"></p>
@@ -54,7 +72,19 @@
                     <li><a class="waves-effect white-text" href="#!">Print all Employees</a></li>
                 </ul>
             </div>
-            <div class="row">
+            <div class="row confirmModalRow" id="confirmModalRow">
+                <div id="confirmDelete" class="modal">
+                <div class="modal-content">
+                    <i class="fas fa-info-circle fa-3x"></i>
+                    <h6><b>Are you sure you want to delete <span id="empToDeleteName"></span></b></h6>
+                </div>
+                <div class="modal-footer">
+                    <a href="#!" class="modal-close waves-effect waves-green btn">No</a>
+                    <a href="#!" class="modal-close waves-effect waves-green btn" id="deleteUser">Yes</a>
+                </div>
+                </div>
+            </div>
+            <div class="row addUser">
                 <div id="addUser" class="modal modal-fixed-footer">
                     <div class="modal-content">
                         <h4 class="center"><u>Enter Employee Details</u></h4>
@@ -151,11 +181,8 @@
     <script>window.$ = window.jQuery = require('jquery');</script>
     <script>window.materialize = window.materialize = require('materialize-css');</script>
     <script type="text/javascript" src="../templates_js/materialize_init.js"></script>
-    <script type="text/javascript" src="../templates_js/hr_validation.js"></script>
     <script>
         require('../../renderers/hrDashboardRenderer.js');
     </script>
-
 </body>
-
 </html>

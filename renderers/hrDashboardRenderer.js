@@ -1,8 +1,9 @@
 const { ipcRenderer } = require('electron');
 const ipc = ipcRenderer;
 const Employee = require('../app/models/Employee.model');
-const saveBtn = document.getElementById('saveUserBtn');
+var moment = require('moment');
 
+const saveBtn = document.getElementById('saveUserBtn');
 saveBtn.addEventListener('click', ()=>{
     var firstName = document.getElementById('first_name').value;
     var surName = document.getElementById('surname').value;
@@ -46,8 +47,6 @@ saveBtn.addEventListener('click', ()=>{
 
 window.addEventListener('contextmenu', (event)=>{
     ipc.send('show-context-menu');
-    // reload loses data figure out how to recapture it
-    // ipc.send('retrieve-employees');
 });
 
 ipc.on('receive-reloaded-employees', (event, args)=>{
@@ -69,10 +68,10 @@ function createEmployeeLi(args){
     var empVarsToDisplay = [];
     var cols = [];
     var fullname = args.Firstname + ' ' + args.Surname;
-    var currentDate = new Date();
-    var age = currentDate - args.DateOfBirth;
+    console.log(args.DateOfHire);
+    var years = moment().diff(args.DateOfHire, 'months');
     empVarsToDisplay.push(fullname);
-    empVarsToDisplay.push(age);
+    empVarsToDisplay.push(years);
     empVarsToDisplay.push(args.MobilePhoneNumber);
     empVarsToDisplay.push(args.Status);
     empVarsToDisplay.push(args.Email);
@@ -90,12 +89,61 @@ function createEmployeeLi(args){
     var row = document.createElement('div');
     row.className = 'row emp-data';
     row.id = args.NationalID;
+
+    var btnDiv = createFloatingBtn(args.NationalID);
+    row.appendChild(btnDiv);
+
+
     cols.forEach((col) => {
         row.appendChild(col);
     });
     const li = document.createElement('li');
+    li.id = args.NationalID;
     li.appendChild(row);
     return li;
+}
+
+function createFloatingBtn(elementId){
+    var btnDiv = document.createElement('div');
+    btnDiv.className = 'fixed-action-btn right';
+
+    var btnA = document.createElement('a');
+    btnA.className = 'btn-floating btn-large red';
+    btnA.id = 'a-float';
+    var aI = document.createElement('i');
+    aI.className = 'fas fa-bars';
+    btnA.appendChild(aI);
+    btnDiv.appendChild(btnA);
+
+    var btnUl = document.createElement('ul');
+
+    var delLi = document.createElement('li');
+    var delA = document.createElement('a');
+    delA.className = 'btn-floating red modal-trigger';
+    // delA.className = 'btn-floating red';
+    delA.id = 'confirmDel';
+    delA.setAttribute('href', '#confirmDelete');
+    var btnI = document.createElement('i');
+    btnI.id = elementId;
+    btnI.className = 'fa fa-trash';
+    btnI.setAttribute('title', 'Delete');
+    delA.appendChild(btnI);
+    delLi.appendChild(delA);
+    btnUl.appendChild(delLi);
+
+    var editLi = document.createElement('li');
+    var editA = document.createElement('a');
+    editA.className = 'btn-floating red modal-trigger';
+    var btnI2 = document.createElement('i');
+    btnI2.className = 'fa fa-edit';
+    btnI2.setAttribute('title', 'edit');
+    editA.appendChild(btnI2);
+    editLi.appendChild(editA);
+    btnUl.appendChild(editLi);
+
+    btnDiv.appendChild(btnUl);
+
+    return btnDiv;
 }
 
 function createEmployeeUl(args){
@@ -109,18 +157,15 @@ function createEmployeeUl(args){
         const cols = [];
         var empVarsToDisplay = [];
         var fullname = emp.Firstname + ' ' + emp.Surname;
-        var currentDate = new Date();
-        var age = currentDate - emp.DateOfBirth;
+        var years;
         Object.keys(emp).forEach(function (key) {
             fullname = emp.Firstname + ' ' + emp.Surname;
-            currentDate = new Date();
-            age = currentDate - emp.DateOfBirth;
+            years = moment().diff(emp.DateOfHire, 'months');
         });
         empVarsToDisplay.push(fullname);
-        empVarsToDisplay.push(age);
+        empVarsToDisplay.push(years);
         empVarsToDisplay.push(emp.MobilePhoneNumber);
         empVarsToDisplay.push(emp.Status);
-        empVarsToDisplay.push(emp.Email);
         empVarsToDisplay.push(emp.NationalID);
         empVarsToDisplay.forEach((varToDisplay) => {
             const data = document.createTextNode(varToDisplay);
@@ -135,6 +180,8 @@ function createEmployeeUl(args){
         const row = document.createElement('div');
         row.className = 'row emp-data';
         row.id = emp.NationalID;
+        var btnDiv = createFloatingBtn(emp.NationalID);
+        row.appendChild(btnDiv);
         cols.forEach((col) => {
             row.appendChild(col);
         });
@@ -142,7 +189,9 @@ function createEmployeeUl(args){
     });
     rows.forEach((row) => {
         const li = document.createElement('li');
+        var liId = row.id;
         li.appendChild(row);
+        li.id = liId;
         lis.push(li);
     });
     lis.forEach((li) => {
@@ -150,3 +199,43 @@ function createEmployeeUl(args){
     });
     return ul;
 }
+
+// const deleteBtn = document.getElementById('deleteEmp');
+// deleteBtn.addEventListener('click', ()=> {
+//     $(document).ready(function () {
+//         $('.modal').modal('close');
+//     });
+// });
+
+$(document).ready(function () {
+    var natId;
+    var className;
+    $("i").click(function (event) {
+        natId = event.target.id;
+        className = event.target.className;
+        if(natId != undefined && className == 'fa fa-trash'){
+            console.log(natId);
+            var reply = ipc.sendSync('get-employee', natId);
+            document.getElementById('empToDeleteName').innerHTML = reply.message.Firstname;
+            document.getElementById('deleteUser').addEventListener('click', ()=> {
+                var delReply = ipc.sendSync('delete-employee', natId);
+                console.log(delReply.message);
+                if (delReply.status == true){
+                    var row = document.getElementById(natId);
+                    row.parentNode.removeChild(row);
+                    M.toast({ html: delReply.message, classes: 'rounded green toast-head' });
+                }
+                document.getElementById('empToDeleteName').innerHTML = '';
+                natId = '';
+            });
+        }
+    });
+});
+
+document.getElementById('searchInputField').addEventListener('keypress', e =>{
+    var key = e.which || e.keyCode;
+    if (key === 13) {
+        console.log('Searching...');
+        console.log(document.getElementById('search').value);
+    }
+});

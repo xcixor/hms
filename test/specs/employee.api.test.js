@@ -23,14 +23,20 @@ var testEmployee = {
     "Status": true
 };
 
-describe('Test the Post route', function(){
-    this.beforeAll(done => {
+describe('Test the Post route', ()=>{
+    beforeEach(done => {
         Employee.deleteMany({}, err => {
             done();
         });
     });
 
-    it('should get all the employees', done => {
+    afterEach(done => {
+        Employee.deleteMany({}, err => {
+            done();
+        });
+    });
+
+    it('should get all the employees and find none', done => {
         chai.request(server).get('/api/employees').end((err, res) => {
             res.should.have.status(200);
             res.body.should.be.a('array');
@@ -60,13 +66,50 @@ describe('Test the Post route', function(){
             done();
         });
     });
+
     it('should create a user successfuly', done => {
     chai.request(server).post('/api/employees').send(testEmployee).end((err, res) => {
-        res.should.have.status(200);
+        res.should.have.status(201);
         res.body.should.be.a('object');
         res.body.should.have.property('status').eql(true);
         res.body.message.Firstname.should.eql('Jimi');
         done();
     });
 });
+});
+
+describe ('Test the delete route', ()=> {
+    it('should get all the employees and find none', done => {
+        chai.request(server).get('/api/employees').end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.be.a('array');
+            res.body.length.should.be.eql(0);
+            done();
+        });
+    });
+    it('should create a user successfuly', done => {
+        chai.request(server).post('/api/employees').send(testEmployee).end((err, res) => {
+            res.should.have.status(201);
+            res.body.should.be.a('object');
+            res.body.should.have.property('status').eql(true);
+            res.body.message.Firstname.should.eql('Jimi');
+            done();
+        });
+    });
+    it('should delete a user successfuly', done => {
+        chai.request(server).del('/api/employee/' + testEmployee.NationalID).end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('status').eql(true);
+            res.body.should.have.property('message').eql('Successfuly deleted Jimi');
+            done();
+        });
+    });
+    it('should get all the employees and find none', done => {
+        chai.request(server).get('/api/employees').end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.be.a('array');
+            res.body.length.should.be.eql(0);
+            done();
+        });
+    });
 });

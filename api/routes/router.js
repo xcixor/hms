@@ -22,7 +22,7 @@ router.post('/employees', (req, res)=>{
                         });
                         res.status(400).json({ 'status': false, 'message': empErrors });
                     } else {
-                        res.send({ 'status': true, 'message': empToSave });
+                        res.status(201).send({ 'status': true, 'message': empToSave });
                     }
                 });
             }else {
@@ -39,13 +39,6 @@ router.get('/employees', (req, res) => {
         __v: false,
         _id: false
     };
-    // Employee.find({}, employeesProjection).then((err, employees) =>{
-    //     if (err){
-    //         res.status(400).send(err);
-    //     }else {
-    //         res.send(employees);
-    //     }
-    // });
     Employee.find({}, employeesProjection, (err, employees)=>{
         if (err){
             res.status(400).send(err);
@@ -53,5 +46,34 @@ router.get('/employees', (req, res) => {
         res.status(200).send(employees);
     });
 });
+
+router.delete('/employee/:nationalId', (req, res) => {
+    Employee.findOneAndDelete({ NationalID: req.params.nationalId}, (err, employee) => {
+        if (err) {
+            res.status(500).send({ 'status': false, 'message': err });
+        }
+        res.status(200).send({ 'status': true, 'message': 'Successfuly deleted ' + employee.Firstname });
+    });
+
+});
+
+router.delete('/employees', (req,res) => {
+    Employee.deleteMany({}, err => {
+        if (err){
+            res.status(500).send({'status': false, 'message': err});
+        }
+        res.status(200).send({'status': true, 'message': 'Deleted all employees'});
+    });
+});
+
+router.get('/employee/:nationalId', (req, res) => {
+    Employee.findOne({NationalID: req.params.nationalId}, (err, employee) => {
+        if(err){
+            res.status(500).send({ 'status': false, 'message': err });
+        }
+        res.send({ 'status': true, 'message': employee});
+    });
+});
+
 
 module.exports = router;

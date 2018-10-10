@@ -184,7 +184,7 @@ ipc.on('create-user', (event, args)=>{
     xhr.open('POST', url, true);
     xhr.onreadystatechange = function () {
         //Call a function when the state changes.
-        if (this.readyState == XMLHttpRequest.DONE || this.status == 200 || this.status == 400 || this.status == 409 || this.status == 409) {
+        if (this.readyState == XMLHttpRequest.DONE || this.status == 201 || this.status == 400 || this.status == 409 || this.status == 409) {
             event.returnValue = JSON.parse(this.responseText);
         } else {
             console.log(this.responseText);
@@ -212,4 +212,32 @@ ipc.on('retrieve-employees', (event, args)=>{
             mainWindow.send('receive-employees', data);
         }, 1000);
     });
+});
+
+ipc.on('get-employee', (event, args)=>{
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/employee/'+args;
+    xhr.addEventListener("load", () => {
+        var data = JSON.parse(xhr.responseText);
+        event.returnValue = data;
+    });
+    xhr.open('GET', url);
+    xhr.send();
+});
+
+// delete employee
+ipc.on('delete-employee', (event, args)=>{
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/employee/' + args;
+    xhr.addEventListener("load", () => {
+        if (xhr.status == 200 || xhr.status == 500){
+            var data = JSON.parse(xhr.responseText);
+            event.returnValue = data;
+        }else {
+            event.returnValue = {'status': false, 'message': 'Error can not delete'};
+        }
+
+    });
+    xhr.open('DELETE', url);
+    xhr.send();
 });
