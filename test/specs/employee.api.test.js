@@ -113,3 +113,43 @@ describe ('Test the delete route', ()=> {
         });
     });
 });
+
+describe('Test api can edit an employee', () => {
+
+    after(done => {
+        Employee.deleteMany({}, err => {
+            done();
+        });
+    });
+
+    it('should create a user successfuly', done => {
+        chai.request(server).post('/api/employees').send(testEmployee).end((err, res) => {
+            res.should.have.status(201);
+            res.body.should.be.a('object');
+            res.body.should.have.property('status').eql(true);
+            res.body.message.Firstname.should.eql('Jimi');
+            done();
+        });
+    });
+
+    var editDetails = {
+        "Firstname": "Jimi",
+        "Surname": "Wanyinge",
+        "Email": "wanyinge@gmail.com",
+        "NationalID": "29811079",
+        "Gender": "Male",
+        "DateOfHire": "3/4/2016",
+        "Status": false
+    };
+
+    it('should edit the employee details', done => {
+        chai.request(server).put('/api/employee/'+ testEmployee.NationalID).send(editDetails).end((err, res) => {
+            res.should.have.status(201);
+            res.body.should.have.property('status').eql(true);
+            res.body.message.Firstname.should.eql('Jimi');
+            res.body.message.Email.should.eql('wanyinge@gmail.com');
+            res.body.message.Status.should.eql(false);
+        });
+        done();
+    });
+});

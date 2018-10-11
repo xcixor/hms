@@ -29,7 +29,7 @@ api.use(bodyParser.json());
 api.use('/api', require('./routes/router'));
 
 // listen for requests
-api.listen(config.Port, () => {
+api.listen(config.Port || 30005, () => {
     console.log('Environment ' + process.env);
     console.log('Listening for requests on port ' + config.Port + '.....');
 });

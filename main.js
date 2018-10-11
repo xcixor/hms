@@ -241,3 +241,21 @@ ipc.on('delete-employee', (event, args)=>{
     xhr.open('DELETE', url);
     xhr.send();
 });
+
+ipc.on('edit-employee', (event, args) => {
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/employee/' + args[0];
+    console.log(url);
+    xhr.open('PUT', url, true);
+    //Send the proper header information along with the request
+    xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+    xhr.onreadystatechange = function () {
+        //Call a function when the state changes.
+        if (this.readyState == XMLHttpRequest.DONE || this.status == 201 || this.status == 500) {
+            event.returnValue = JSON.parse(this.responseText);
+        } else {
+            console.log(this.responseText);
+        }
+    };
+    xhr.send(JSON.stringify(args[1]));
+});

@@ -88,6 +88,10 @@ h5 {
     padding-bottom: 450px;
 }
 
+.editUser .modal {
+    padding-bottom: 450px;
+}
+
 #searchRow {
     padding-top: 20px !important;
     background-color: #A0A0A0;

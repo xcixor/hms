@@ -17,7 +17,7 @@
 
 
 // describe('Test Splash Screen', function () {
-//     this.timeout(6000);
+    // this.timeout(6000);
 //     let app = null;
 
 //     // stand up/ set up
