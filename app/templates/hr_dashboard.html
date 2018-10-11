@@ -176,6 +176,81 @@
                     </div>
                 </div>
             </div>
+            <div class="row editUser">
+                <div id="editUser" class="modal modal-fixed-footer">
+                    <div class="modal-content">
+                        <h4 class="center"><u>Edit Employee</u></h4>
+                        <div class="row">
+                            <form class="col s12" action="#" id="empEditForm">
+                                <div class="row">
+                                    <div class="input-field col s4">
+                                        <input id="first_name" type="text">
+                                    </div>
+                                    <div class="input-field col s4">
+                                        <input id="surname" type="text">
+                                    </div>
+                                    <div class="input-field col s4">
+                                        <input id="last_name" type="text">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <input id="email" type="email">
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <input id="dob" type="text" class="datepicker" placeholder="Date of Birth" class="validate">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <input id="national_id" type="text">
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <input id="tel" type="text">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <input id="residence" type="text">
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <input id="address" type="text">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s6">
+                                        <div class="input-field" id="genderInput">
+                                            <select id="gender">
+                                                <option value="" disabled selected>Click to change Gender</option>
+                                                <option value="1">Male</option>
+                                                <option value="2">Female</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <input id="doh" type="text" class="datepicker" placeholder="Date of Hire" class="validate">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s12">
+                                        <div class="input-field inline">
+                                            <select id="status">
+                                                <option value="" disabled selected>Click to change Status</option>
+                                                <option value="1">Active</option>
+                                                <option value="2">Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#!" class="modal-close waves-effect waves-green btn" id="cancelBtn">CANCEL</a>
+                        <a href="#!" class="waves-effect waves-green btn" id="editUserBtn">SAVE</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <script>window.$ = window.jQuery = require('jquery');</script>

@@ -68,13 +68,11 @@ function createEmployeeLi(args){
     var empVarsToDisplay = [];
     var cols = [];
     var fullname = args.Firstname + ' ' + args.Surname;
-    console.log(args.DateOfHire);
     var years = moment().diff(args.DateOfHire, 'months');
     empVarsToDisplay.push(fullname);
     empVarsToDisplay.push(years);
     empVarsToDisplay.push(args.MobilePhoneNumber);
     empVarsToDisplay.push(args.Status);
-    empVarsToDisplay.push(args.Email);
     empVarsToDisplay.push(args.NationalID);
     empVarsToDisplay.forEach((varToDisplay) => {
         var data = document.createTextNode(varToDisplay);
@@ -134,8 +132,10 @@ function createFloatingBtn(elementId){
     var editLi = document.createElement('li');
     var editA = document.createElement('a');
     editA.className = 'btn-floating red modal-trigger';
+    editA.setAttribute('href', '#editUser');
     var btnI2 = document.createElement('i');
     btnI2.className = 'fa fa-edit';
+    btnI2.id = elementId;
     btnI2.setAttribute('title', 'edit');
     editA.appendChild(btnI2);
     editLi.appendChild(editA);
@@ -200,26 +200,17 @@ function createEmployeeUl(args){
     return ul;
 }
 
-// const deleteBtn = document.getElementById('deleteEmp');
-// deleteBtn.addEventListener('click', ()=> {
-//     $(document).ready(function () {
-//         $('.modal').modal('close');
-//     });
-// });
-
-$(document).ready(function () {
+$(document).ready( () => {
     var natId;
     var className;
-    $("i").click(function (event) {
+    $("i").click(event => {
         natId = event.target.id;
         className = event.target.className;
         if(natId != undefined && className == 'fa fa-trash'){
-            console.log(natId);
-            var reply = ipc.sendSync('get-employee', natId);
+            const reply = ipc.sendSync('get-employee', natId);
             document.getElementById('empToDeleteName').innerHTML = reply.message.Firstname;
             document.getElementById('deleteUser').addEventListener('click', ()=> {
                 var delReply = ipc.sendSync('delete-employee', natId);
-                console.log(delReply.message);
                 if (delReply.status == true){
                     var row = document.getElementById(natId);
                     row.parentNode.removeChild(row);
@@ -229,13 +220,101 @@ $(document).ready(function () {
                 natId = '';
             });
         }
+        else if(natId != undefined && className == 'fa fa-edit'){
+            const reply = ipc.sendSync('get-employee', natId);
+            var fName = $('#empEditForm').find('#first_name').val(reply.message.Firstname);
+            var sName = $('#empEditForm').find('#surname').val(reply.message.Surname);
+            var lName = $('#empEditForm').find('#last_name').val(reply.message.Lastname);
+            var email = $('#empEditForm').find('#email').val(reply.message.Email);
+            var dob = $('#empEditForm').find('#dob').val(reply.message.DateOfBirth);
+            var nationalId = $('#empEditForm').find('#national_id').val(reply.message.NationalID);
+            var tel = $('#empEditForm').find('#tel').val(reply.message.MobilePhoneNumber);
+            var residence = $('#empEditForm').find('#residence').val(reply.message.Residence);
+            var address = $('#empEditForm').find('#address').val(reply.message.Address);
+            var genderOption;
+            switch(reply.message.Gender){
+                case "Male":
+                    genderOption = "1";
+                    break;
+                case "Female":
+                    genderOption = "2";
+                    break;
+            }
+            var gender = $('#empEditForm').find('#gender').val(genderOption).trigger('change');
+            var doh = $('#empEditForm').find('#doh').val(reply.message.DateOfHire);
+            var statusOption;
+            switch (reply.message.Status) {
+                case true:
+                    statusOption = "1";
+                    break;
+                case false:
+                    statusOption = "2";
+                    break;
+            }
+            var status = $('#empEditForm').find('#status').val(statusOption).trigger('change');
+
+            // edit user
+            $('#editUserBtn').click( event =>{
+                var newFName = fName.val();
+                var newLName = lName.val();
+                var newSName = sName.val();
+                var newEmail = email.val();
+                var newDob = dob.val();
+                var newNatId = nationalId.val();
+                var newTel = tel.val();
+                var newResidence = residence.val();
+                var newAddress = address.val();
+                var newGender = $('#empEditForm').find('#gender option:selected').text();
+                var newDoh = doh.val();
+                var newStatus = $('#empEditForm').find('#status option:selected').text();
+                var editStatus;
+                switch (newStatus) {
+                    case "Active":
+                        editStatus = true;
+                        break;
+                    case "Inactive":
+                        editStatus = false;
+                        break;
+                }
+                var newEmpDetails = {
+                    "Firstname": newFName,
+                    "Lastname": newLName,
+                    "Surname": newSName,
+                    "Email": newEmail,
+                    "DateOfBirth": newDob,
+                    "NationalID": newNatId,
+                    "MobilePhoneNumber": newTel,
+                    "Residence": newResidence,
+                    "Address": newAddress,
+                    "Gender": newGender,
+                    "DateOfHire": newDoh,
+                    "Status": editStatus
+                };
+                var editResponse = ipc.sendSync('edit-employee', [natId, newEmpDetails]);
+                console.log(editResponse.message);
+                if(editResponse.status == true){
+                    $(document).ready(function () {
+                        $('.modal').modal('close');
+                        var empData = editResponse.message;
+                        var linkToRemove = document.getElementById(natId);
+                        console.log(linkToRemove);
+                        linkToRemove.parentNode.removeChild(linkToRemove);
+                        var li = createEmployeeLi(empData);
+                        const empList = document.getElementById('empList');
+                        empList.appendChild(li);
+                    });
+                }
+
+            });
+        }
     });
 });
 
-document.getElementById('searchInputField').addEventListener('keypress', e =>{
-    var key = e.which || e.keyCode;
-    if (key === 13) {
-        console.log('Searching...');
-        console.log(document.getElementById('search').value);
-    }
-});
+// // to implement when searching
+// document.getElementById('searchInputField').addEventListener('keypress', e =>{
+//     var key = e.which || e.keyCode;
+//     if (key === 13) {
+//         console.log('Searching...');
+//         console.log(document.getElementById('search').value);
+//     }
+// });

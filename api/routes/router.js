@@ -75,5 +75,13 @@ router.get('/employee/:nationalId', (req, res) => {
     });
 });
 
+router.put('/employee/:nationalId', (req, res) => {
+    Employee.findOneAndUpdate({ NationalID: req.params.nationalId }, req.body, { new: true, upsert: true, setDefaultsOnInsert: true}, (err, employee) => {
+        if(err){
+            res.status(500).send({'status': false, 'message': err});
+        }
+        res.status(201).send({ 'status': true, 'message': employee });
+    });
+});
 
 module.exports = router;
