@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link type="text/css" rel="stylesheet" href="../materialize/materialize.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="../templates-css/index.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="../font-awesome/css/all.css"/>
+</head>
+<body>
+    <nav>
+        <div class="nav-wrapper  blue darken-4">
+            <a class="brand-logo center">Hotel Management System</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col s3"></div>
+            <div class="col s6 signup-form">
+                <h4 class="center">Sign in</h4>
+                <h5 class="center">Sign in to continue to your worspace</h5>
+                <h6>Sign in as</h6>
+                <form action="#!">
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="username" type="text" class="validate">
+                            <label for="username">Username</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="password" type="password" class="validate">
+                            <label for="password">Password</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                        <button class="btn" id="loginBtn">SIGN IN</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <ul class="center">
+                        <li class="vertical-line">Settings</li>
+                        <li id="loginPop">Admin</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col s3"></div>
+        </div>
+    </div>
+    <script>
+        require('../../renderers/indexrenderer.js');
+    </script>
+    <script type="text/javascript" src="../materialize/materialize.js"></script>
+</body>
+</html>
