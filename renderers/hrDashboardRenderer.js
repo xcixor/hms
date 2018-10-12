@@ -2,6 +2,11 @@ const { ipcRenderer } = require('electron');
 const ipc = ipcRenderer;
 const Employee = require('../app/models/Employee.model');
 var moment = require('moment');
+var jsPDF = require('jspdf');
+require('jspdf-autotable');
+
+
+
 
 const saveBtn = document.getElementById('saveUserBtn');
 saveBtn.addEventListener('click', ()=>{
@@ -291,24 +296,59 @@ $(document).ready( () => {
                     "Status": editStatus
                 };
                 var editResponse = ipc.sendSync('edit-employee', [natId, newEmpDetails]);
-                console.log(editResponse.message);
                 if(editResponse.status == true){
                     $(document).ready(function () {
                         $('.modal').modal('close');
                         var empData = editResponse.message;
                         var linkToRemove = document.getElementById(natId);
-                        console.log(linkToRemove);
                         linkToRemove.parentNode.removeChild(linkToRemove);
                         var li = createEmployeeLi(empData);
                         const empList = document.getElementById('empList');
                         empList.appendChild(li);
                     });
                 }
-
             });
         }
     });
 });
+
+$('#printEmployee').click( e => {
+    global.window = { document: { createElementNS: () => { return {} } } };
+    global.navigator = {};
+    global.btoa = () => { };
+    var empData = ipc.sendSync('retrieve-employees-sync');
+    var empDataToPrint = [];
+    empData.forEach(emp => {
+        var names = emp.Firstname + ' ' + emp.Surname;
+        var status = emp.Status;
+        var workingStatus;
+        switch (status) {
+            case true:
+                workingStatus = 'Working';
+                break;
+            case false:
+                workingStatus = 'Not Working';
+                break;
+        }
+        var id = emp.NationalID;
+        var mobile = emp.MobilePhoneNumber;
+        var doh = emp.DateOfHire;
+        empDataToPrint.push([names, workingStatus, id, mobile, doh]);
+    });
+    var columns = ["Names", "Working Status", "National ID", "Mobile Phone Number", "Date Of Hire"];
+    var rows = [];
+    empDataToPrint.forEach(empData => {
+        rows.push([empData[0], empData[1], empData[2], empData[3], empData[4]]);
+    });
+    var doc = new jsPDF('p', 'pt');
+    doc.autoTable(columns, rows);
+    doc.save('employees.pdf');
+
+    delete global.window;
+    delete global.navigator;
+    delete global.btoa;
+});
+
 
 // // to implement when searching
 // document.getElementById('searchInputField').addEventListener('keypress', e =>{

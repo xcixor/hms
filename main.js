@@ -214,6 +214,12 @@ ipc.on('retrieve-employees', (event, args)=>{
     });
 });
 
+ipc.on('retrieve-employees-sync', (event, args) => {
+    loadEmployees((data) => {
+        event.returnValue = data;
+    });
+});
+
 ipc.on('get-employee', (event, args)=>{
     var xhr = new XMLHttpRequest();
     var url = 'http://localhost:8000/api/employee/'+args;
