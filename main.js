@@ -2,19 +2,24 @@
 process.env.NODE_ENV = 'dev';
 
 const electron = require('electron');
+
 // module to control application life
 const app = electron.app;
-// module to create native browser window
-const BrowserWindow = electron.BrowserWindow;
+
 // module to facilitate interprocess communication
 const ipc = electron.ipcMain;
+
+// reload module
+require('electron-reload')(__dirname);
+
+// module to create native browser window
+const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path');
 
 const url = require('url');
 
 const contextMenu = require('./app/windows/maincontextmenu');
-
 
 const api = require('./api/api');
 
@@ -160,9 +165,11 @@ ipc.on('close-admin-login-window', ()=> {
 });
 
 ipc.on('admin-login', function(event, args){
+    changeView(mainWindow, adminDashboard);
+    adminLogin.close();
     if(args[0] === 'admin'){
-        adminLogin.close();
-        changeView(mainWindow, adminDashboard);
+        // adminLogin.close();
+        // changeView(mainWindow, adminDashboard);
         event.returnValue = 'success';
     }else{
         event.returnValue = 'sth';
@@ -264,4 +271,32 @@ ipc.on('edit-employee', (event, args) => {
         }
     };
     xhr.send(JSON.stringify(args[1]));
+});
+ipc.on('create-account', (event, args) => {
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/user';
+    xhr.open('POST', url, true);
+    xhr.onreadystatechange = function () {
+        //Call a function when the state changes.
+        if (this.readyState == XMLHttpRequest.DONE || this.status == 201 || this.status == 400 || this.status == 409 || this.status == 409) {
+            event.returnValue = JSON.parse(this.responseText);
+        } else {
+            console.log(this.responseText);
+        }
+    };
+    //Send the proper header information along with the request
+    xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+    xhr.send(JSON.stringify(args));
+});
+
+ipc.on('reload-admin-page', (event, args) => {
+    // mainWindow.webContents.reload();
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/users';
+    xhr.addEventListener("load", () => {
+        var data = JSON.parse(xhr.responseText);
+        event.sender.send('admin-page-reloaded', data);
+    });
+    xhr.open('GET', url);
+    xhr.send();
 });

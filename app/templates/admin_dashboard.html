@@ -2,53 +2,133 @@
 <html lang="en">
 
 <head>
-    <link type="text/css" rel="stylesheet" href="../materialize/materialize.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="../../node_modules/materialize-css/dist/css/materialize.css" media="screen,projection" />
     <link type="text/css" rel="stylesheet" href="../templates-css/admin_dashboard.css" media="screen,projection" />
     <link type="text/css" rel="stylesheet" href="../font-awesome/css/all.css" />
 </head>
 
 <body>
     <div class="content">
-    <nav>
-        <div class="nav-wrapper  blue darken-4">
-            <a class="brand-logo center">Admin Dashboard</a>
-        </div>
-    </nav>
-    <div class="container">
-        <div class="row">
-            user with accounts will appeare here with some details
-        </div>
-        <div class="side-menu">
-        <ul id="slide-out" class="sidenav sidenav-fixed">
-            <li>
-                <div class="user-view">
-                    <div class="background">
-                        <img src="images/office.jpg">
-                    </div>
-                    <a href="#user"><img class="circle" src="../assets/user_images/back6.jpeg"></a>
-                    <a href="#name"><span class="black-text name">Admin</span></a>
-                    <a href="#email"><span class="black-text email">jdandturk@gmail.com</span></a>
+        <nav>
+            <div class="nav-wrapper  blue darken-4">
+                <a class="brand-logo center">Admin Dashboard</a>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="row main-content">
+                <div class="row">
+                    <h5>User Accounts</h5>
                 </div>
-            </li>
-            <li><a class="subheader">Account Actions</a></li>
-            <li><a href="#!" id="createAccountBtn">Create New Account</a></li>
-            <li><a href="#!">View an account details</a></li>
-            <li><a href="#!">Update an Account</a></li>
-            <li><a href="#!">Delete an Account</a></li>
-            <li>
-                <div class="divider"></div>
-            </li>
-            <li><a class="subheader">AOB</a></li>
-            <li><a class="waves-effect" href="#!">Some AOB</a></li>
-        </ul>
+            <div class="row" id="accountsData"></div>
+            <div class="row">
+                <div id="confirmDelete" class="modal">
+                    <div class="modal-content">
+                        <h4>Modal Header</h4>
+                        <p>A bunch of text</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="row">
+                <div id="createAccountForm" class="modal">
+                    <div class="modal-content">
+                        <div class="row">
+                            <h4 class="center">Create Account</h4>
+                        </div>
+                        <div class="row">
+                            <form class="col s12" id="accountForm">
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <input id="username" type="text" class="validate" required>
+                                        <label for="username">Username</label>
+                                        <span class="helper-text" data-error="Username is required"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <input id="password" type="password" class="validate">
+                                        <label for="password">Password</label>
+                                        <span class="helper-text" data-error="Passwords should not be blank"></span>
+                                    </div>
+                                        <div class="input-field col s6">
+                                            <input id="confirmPassword" type="password" class="validate">
+                                            <label for="confirmPassword">Confirm Password</label>
+                                            <span class="helper-text" data-error="Confirmation password should match the password you entered"></span>
+                                        </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <input id="userId" type="text" class="validate">
+                                        <label for="userId">User's National Id</label>
+                                        <span class="helper-text" data-error="User Id is required"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s12">
+                                        <div class="input-field inline">
+                                            <select id="department" class="validate materialize-default" required>
+                                                <option value="" disabled selected>Department</option>
+                                                <option value="1">Human Resource</option>
+                                                <option value="2">Accounts and Finance</option>
+                                                <option value="2">Procurement</option>
+                                            </select>
+                                            <label id="depError" class="helper-text"></label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col m6">
+                                <a href="#!" class="modal-close waves-effect waves-green btn">Cancel</a>
+                            </div>
+                            <div class="col m6">
+                                <a href="#!" class="waves-effect waves-green btn" id="saveAccount">Save</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="side-menu">
+            <ul id="slide-out" class="sidenav sidenav-fixed">
+                <li>
+                    <div class="user-view">
+                        <div class="background">
+                            <img src="images/office.jpg">
+                        </div>
+                        <a href="#user"><img class="circle" src="../assets/user_images/back6.jpeg"></a>
+                        <a href="#name"><span class="black-text name">Admin</span></a>
+                        <a href="#email"><span class="black-text email">jdandturk@gmail.com</span></a>
+                    </div>
+                </li>
+                <li><a class="subheader">Account Actions</a></li>
+                <li><a href="#createAccountForm" class="modal-trigger" id="createAccountBtn">Create New Account</a></li>
+                <li><a href="#!">View an account details</a></li>
+                <li><a href="#!">Update an Account</a></li>
+                <li><a href="#!">Delete an Account</a></li>
+                <li>
+                    <div class="divider"></div>
+                </li>
+                <li><a class="subheader">AOB</a></li>
+                <li><a class="waves-effect" href="#!">Some AOB</a></li>
+            </ul>
+            </div>
         </div>
     </div>
-    </div>
+    <script>window.$ = window.jQuery = require('jquery');</script>
+    <script>window.materialize = window.materialize = require('materialize-css');</script>
     <script>
         require('../../renderers/adminRenderer.js');
     </script>
-    <script type="text/javascript" src="../materialize/materialize.js"></script>
-    <script type="text/javascript" src="../templates_js/admin_dashboard.js"></script>
+    <script type="text/javascript" src="../templates_js/materialize_init.js"></script>
+    // </script>
 </body>
 
 </html>

@@ -1,6 +1,7 @@
 process.env.NODE_ENV = 'test';
 const mongoose = require('mongoose');
 const Employee = require('../../api/models/employee.model');
+const User = require('../../api/models/user.model');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -151,5 +152,86 @@ describe('Test api can edit an employee', () => {
             res.body.message.Status.should.eql(false);
         });
         done();
+    });
+});
+
+describe('Test api can create user account', ()=>{
+    beforeEach(done => {
+        User.deleteMany({}, err => {
+            done();
+        });
+    });
+
+    afterEach(done => {
+        User.deleteMany({}, err => {
+            done();
+        });
+    });
+
+    it('should search for empaccounts and find none', done => {
+        chai.request(server).get('/api/users').end((err, res) => {
+            console.log(err);
+            res.should.have.status(200);
+            res.body.should.be.a('array');
+            res.body.length.should.be.eql(0);
+            done();
+        });
+    });
+    it('should not create a user account without all the required details', done => {
+        var testUser = {
+            "Username": 'hradmin',
+            "Password": 'hradmin2018#'
+        };
+        chai.request(server).post('/api/user').send(testUser).end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property('status').eql(false);
+            res.body.should.have.property('message').eql(
+                ['The user\'s Id is required',
+                'The user\'s department is required']);
+            done();
+        });
+    });
+    it('should not create an account if the password is too short', done => {
+        var testUser = {
+            "Username": 'hradmin',
+            "Password": 'hr18',
+            "DepartmentId": 'someId',
+            "EmployeeId": 'empId'
+        };
+        chai.request(server).post('/api/user').send(testUser).end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property('status').eql(false);
+            res.body.should.have.property('message').eql(['Password should not be less than 8 characters']);
+            done();
+        });
+    });
+    it('should not create an account if the password does not have special xter or a number', done => {
+        var testUser = {
+            "Username": 'hradmin',
+            "Password": 'hradmininstrator',
+            "DepartmentId": 'someId',
+            "EmployeeId": 'empId'
+        };
+        chai.request(server).post('/api/user').send(testUser).end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property('status').eql(false);
+            res.body.should.have.property('message').eql(['Password must contain a number or special character']);
+            done();
+        });
+    });
+    it('should create a user account with all the required details', done => {
+        var testUser = {
+            "Username": 'hradmin',
+            "Password": 'hradmin2018#',
+            "DepartmentId": 'HR001',
+            "EmployeeId": 'empId'
+        };
+        chai.request(server).post('/api/user').send(testUser).end((err, res) => {
+            res.should.have.status(201);
+            res.body.should.have.property('status').eql(true);
+            res.body.should.be.a('object');
+            res.body.message.Username.should.eql('hradmin');
+            done();
+        });
     });
 });

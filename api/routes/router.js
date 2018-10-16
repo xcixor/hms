@@ -4,6 +4,11 @@ const router = express.Router();
 
 const Employee = require('../models/employee.model');
 
+const User = require('../models/user.model');
+
+const bcrypt = require('bcrypt-nodejs');
+
+
 // create a new employee resource
 router.post('/employees', (req, res)=>{
     var id = req.body.NationalID;
@@ -71,7 +76,11 @@ router.get('/employee/:nationalId', (req, res) => {
         if(err){
             res.status(500).send({ 'status': false, 'message': err });
         }
-        res.send({ 'status': true, 'message': employee});
+        if(employee == null){
+            res.status(404).send({'status': false, 'message': 'User not found'});
+        }else {
+            res.send({ 'status': true, 'message': employee });
+        }
     });
 });
 
@@ -81,6 +90,61 @@ router.put('/employee/:nationalId', (req, res) => {
             res.status(500).send({'status': false, 'message': err});
         }
         res.status(201).send({ 'status': true, 'message': employee });
+    });
+});
+
+router.post('/user', (req, res) => {
+    var userName = req.body.Username;
+    var accountErrors = [];
+    var body = req.body;
+    var hash = bcrypt.hashSync(req.body.Password);
+    body.PasswordHash = hash;
+    User.find({Username: userName}, (err, user) => {
+        if(err){
+            res.status(422).send({'message': accountErrors.push(err)});
+        }else{
+            if(user.length == 0){
+                User.find({EmployeeId: req.body.EmployeeId}, (err, user) => {
+                    if(err){
+                        res.status(422).send({ 'message': accountErrors.push(err) });
+                    }else {
+                        if(user.length == 0){
+                            var accountData = new User(body);
+                            accountData.save((err, emp) => {
+                                if (err) {
+                                    Object.keys(err.errors).forEach(key => {
+                                        accountErrors.push(err.errors[key].message);
+                                    });
+                                    res.status(400).send({ 'status': false, 'message': accountErrors });
+                                } else {
+                                    // res.status(201).send({ 'status': true, 'message': userName + '\'s' + ' account has successfuly been created' });
+                                    res.status(201).send({ 'status': true, 'message': emp });
+                                }
+                            });
+                        }else {
+                            accountErrors.push("An employee with a similar Id is already registered");
+                            res.status(409).send({ 'status': false, 'message': accountErrors });
+                        }
+                    }
+                });
+            }else {
+                accountErrors.push("An employee with a similar username is already registered");
+                res.status(409).send({'status': false, 'message': accountErrors});
+            }
+        }
+    });
+});
+
+router.get('/users', (req, res) => {
+    var accountProjection = {
+        Password: false,
+        PasswordHash: false
+    };
+    User.find({}, accountProjection, (err, users) => {
+        if(err){
+            res.status(400).send(err);
+        }
+        res.status(200).send(users);
     });
 });
 
