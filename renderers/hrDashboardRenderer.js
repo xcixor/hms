@@ -5,9 +5,6 @@ var moment = require('moment');
 var jsPDF = require('jspdf');
 require('jspdf-autotable');
 
-
-
-
 const saveBtn = document.getElementById('saveUserBtn');
 saveBtn.addEventListener('click', ()=>{
     var firstName = document.getElementById('first_name').value;

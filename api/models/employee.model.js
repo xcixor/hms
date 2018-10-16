@@ -58,7 +58,7 @@ const EmployeeSchema = new Schema({
                 message: 'Surname should contain alphabet characters only',
             }),
         ]
-    },
+    }, 
     Email: {
         type: String,
         required: false,
