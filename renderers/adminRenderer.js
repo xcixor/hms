@@ -232,7 +232,3 @@ ipc.on('admin-page-reloaded', (event, args) => {
     var uls = ulData.Ul;
     $('#accountsData').append(uls);
 });
-
-// setInterval(()=>{
-//     ipc.send('reload-admin-page');
-// }, 15000);
