@@ -148,4 +148,36 @@ router.get('/users', (req, res) => {
     });
 });
 
+router.get('/user/:_id', (req, res) => {
+    User.findById(req.params._id, (err, account) => {
+        if (err) {
+            res.status(500).send({ 'status': false, 'message': err });
+        }else {
+            res.send({ 'status': true, 'message': account });
+        }
+    });
+});
+
+router.put('/user/:accountId', (req, res) => {
+    var accountErrors = [];
+    var opts = { new: true, upsert: false, setDefaultsOnInsert: true, runValidators: true }
+    var hash = bcrypt.hashSync(req.body.Password);
+    req.body.PasswordHash = hash;
+    User.findByIdAndUpdate({ _id: req.params.accountId }, req.body, opts, (err, account) => {
+        if (err) {
+            if (Object.keys(err).length === 0){
+                res.status(404).send({ 'status': true, 'message': "That user does not exist" });
+            }else{
+                Object.keys(err.errors).forEach(key => {
+                    accountErrors.push(err.errors[key].message);
+                });
+                res.status(400).send({ 'status': false, 'message': accountErrors });
+            }
+        }
+        else{
+            res.status(201).send({ 'status': true, 'message': account });
+        }
+    });
+});
+
 module.exports = router;
