@@ -244,31 +244,56 @@ $('#accountsData').on('click', 'i', e => {
             $('#editAccountForm').find('#Password').val(account.Password);
             $('#editAccountForm').find('#userId').val(account.EmployeeId);
             $('#editAccountForm').find('#department').val(account.DepartmentId);
+            $('#cancelEdit').unbind().click(() => {
+                $('#editAccountForm').trigger('reset');
+                $('#userName').attr('disabled', true);
+                $('#Password').attr('disabled', true);
+            });
+            var oldUserName = $('#editAccountForm').find('#userName').val();
+            var oldPassword = $('#editAccountForm').find('#Password').val();
+
             $('#editAccount').unbind().click( ()=>{
                 var editData = {};
                 var newUsername = $('#editAccountForm').find('#userName');
                 var newPassword = $('#editAccountForm').find('#Password');
-                if (newUsername.val() != "" || newUsername.val().trim()){
-                    editData.Username = newUsername.val();
+                if (newUsername.val() != "" || newUsername.val().trim()) {
+                    if(newUsername.val() != oldUserName){
+                        editData.Username = newUsername.val();
+                    }
                 }
-                if (newPassword.val() != "" || newPassword.val().trim()){
-                    editData.Password = newPassword.val();
+                if (newPassword.val() != "" || newPassword.val().trim()) {
+                    if (newPassword.val() != oldPassword){
+                        editData.Password = newPassword.val();
+                    }
                 }
                 console.log(editData);
-                var editResponse = ipc.sendSync('edit-account', [accountId, editData]);
-                if(editResponse.status == true){
-                    $(document).ready( () => {
-                        $('.modal').modal('close');
-                        $('#editAccountForm').trigger('reset');
-                        $('#userName').attr('disabled', true);
-                        $('#Password').attr('disabled', true);
+                if (Object.keys(editData).length !== 0) {
+                    var editResponse = ipc.sendSync('edit-account', [accountId, editData]);
+                    if (editResponse.status == true) {
+                        $(document).ready(() => {
+                            $('.modal').modal('close');
+                            $('#editAccountForm').trigger('reset');
+                            $('#userName').attr('disabled', true);
+                            $('#Password').attr('disabled', true);
 
-                        var successData = editResponse.message;
-                        $('#' + accountId).empty();
-                        var li = createAccountLiData(successData);
-                        $('#accountsList').append(li);
-                        M.toast({ html: editResponse.message.Username + ' Successfuly edited!', classes: 'rounded green toast-head' });
-                    });
+                            var successData = editResponse.message;
+                            $('#' + accountId).empty();
+                            var li = createAccountLiData(successData);
+                            $('#accountsList').append(li);
+                            M.toast({ html: editResponse.message.Username + ' Successfuly edited!', classes: 'rounded green toast-head' });
+                        });
+                    } else {
+                        M.toast({ html: "There are errors in the form, Please check ther errors below", classes: 'rounded red toast-head' });
+                        for (var i = 0, len = editResponse.message.length; i < len; i++) {
+                            M.toast({ html: editResponse.message[i], classes: 'rounded red black-text' });
+                        }
+                    }
+                }else {
+                    $('.modal').modal('close');
+                    $('#editAccountForm').trigger('reset');
+                    $('#userName').attr('disabled', true);
+                    $('#Password').attr('disabled', true);
+                    M.toast({ html: "No changes detected", classes: 'rounded orange black-text' });
                 }
             });
         }else {
