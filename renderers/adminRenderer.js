@@ -2,7 +2,6 @@ const { ipcRenderer } = require('electron');
 const ipc = ipcRenderer;
 const $ = require('jquery');
 $(document).ready(function () {
-    console.log('reload');
     ipc.send('reload-admin-page');
 });
 
@@ -79,10 +78,6 @@ $('#saveAccount').click( e => {
             var li = createAccountLiData(creationMessage.message);
             ul.append(li);
             $('#accountsData').append(ul);
-
-            // setTimeout(()=> {
-                // ipc.send('reload-admin-page');
-            // }, 2000);
         }
     }
 });
@@ -106,7 +101,6 @@ function createAccountLiData(args){
     });
     var row = $('<div></div>');
     row.addClass('row emp-data');
-    // row.className = 'row emp-data';
     row.attr('id', args._id);
     $('document').ready(() => {
         $('.fixed-action-btn').floatingActionButton();
@@ -128,6 +122,7 @@ function createAccountLiData(args){
 }
 
 function createFAB(elementId){
+
     var fabDiv = $('<div></div>');
     fabDiv.addClass('fixed-action-btn right');
 
@@ -145,10 +140,12 @@ function createFAB(elementId){
     var firstLiA = $('<a></a>');
     firstLiA.addClass('btn-floating red modal-trigger');
     firstLiA.attr('href', '#confirmDelete');
+
     var firstLiI = $('<i></i>');
     firstLiI.addClass('material-icons fa fa-trash');
     firstLiI.attr('id', elementId);
     firstLiI.attr('title', 'Delete');
+
     firstLiA.append(firstLiI);
     firstLi.append(firstLiA);
     ul.append(firstLi);
@@ -210,7 +207,8 @@ function createAccountUlData(args){
         rows.push(row);
     });
     rows.forEach((row) => {
-        const li = $('<li>').attr('id', row.id);
+        const li = $('<li>');
+        li.attr('id', row.id).attr('id', row.attr('id'));
         li.append(row);
         var id = row.attr('id');
         rowIds.push(id);
@@ -227,8 +225,98 @@ window.addEventListener('contextmenu', (event) => {
 });
 
 ipc.on('admin-page-reloaded', (event, args) => {
-    console.log('reloaded');
     var ulData = createAccountUlData(args);
     var uls = ulData.Ul;
     $('#accountsData').append(uls);
+});
+
+$('#accountsData').on('click', 'i', e => {
+    event.preventDefault();
+    var accountId;
+    var btnClassName;
+    accountId = event.target.id;
+    btnClassName = event.target.className;
+    if (accountId != "" && btnClassName == 'material-icons fa fa-edit'){
+        var accountRes = ipc.sendSync('get-account', accountId);
+        if (accountRes.status == true){
+            var account = accountRes.message;
+            $('#editAccountForm').find('#userName').val(account.Username);
+            $('#editAccountForm').find('#Password').val(account.Password);
+            $('#editAccountForm').find('#userId').val(account.EmployeeId);
+            $('#editAccountForm').find('#department').val(account.DepartmentId);
+            $('#cancelEdit').unbind().click(() => {
+                $('#editAccountForm').trigger('reset');
+                $('#userName').attr('disabled', true);
+                $('#Password').attr('disabled', true);
+            });
+            var oldUserName = $('#editAccountForm').find('#userName').val();
+            var oldPassword = $('#editAccountForm').find('#Password').val();
+
+            $('#editAccount').unbind().click( ()=>{
+                var editData = {};
+                var newUsername = $('#editAccountForm').find('#userName');
+                var newPassword = $('#editAccountForm').find('#Password');
+                if (newUsername.val() != "" || newUsername.val().trim()) {
+                    if(newUsername.val() != oldUserName){
+                        editData.Username = newUsername.val();
+                    }
+                }
+                if (newPassword.val() != "" || newPassword.val().trim()) {
+                    if (newPassword.val() != oldPassword){
+                        editData.Password = newPassword.val();
+                    }
+                }
+                console.log(editData);
+                if (Object.keys(editData).length !== 0) {
+                    var editResponse = ipc.sendSync('edit-account', [accountId, editData]);
+                    if (editResponse.status == true) {
+                        $(document).ready(() => {
+                            $('.modal').modal('close');
+                            $('#editAccountForm').trigger('reset');
+                            $('#userName').attr('disabled', true);
+                            $('#Password').attr('disabled', true);
+
+                            var successData = editResponse.message;
+                            $('#' + accountId).empty();
+                            var li = createAccountLiData(successData);
+                            $('#accountsList').append(li);
+                            M.toast({ html: editResponse.message.Username + ' Successfuly edited!', classes: 'rounded green toast-head' });
+                        });
+                    } else {
+                        M.toast({ html: "There are errors in the form, Please check ther errors below", classes: 'rounded red toast-head' });
+                        for (var i = 0, len = editResponse.message.length; i < len; i++) {
+                            M.toast({ html: editResponse.message[i], classes: 'rounded red black-text' });
+                        }
+                    }
+                }else {
+                    $('.modal').modal('close');
+                    $('#editAccountForm').trigger('reset');
+                    $('#userName').attr('disabled', true);
+                    $('#Password').attr('disabled', true);
+                    M.toast({ html: "No changes detected", classes: 'rounded orange black-text' });
+                }
+            });
+        }else {
+            alert('That user is currently unavailable');
+            $('#accountsData a').removeClass('modal-trigger');
+        }
+    }
+});
+
+$('#editAccountForm').on('click', '#editName', e => {
+    if ($('#userName').attr('disabled') == 'disabled') {
+        $('#userName').attr('disabled', false);
+    } else {
+        $('#userName').attr('disabled', true);
+    }
+});
+
+$('#editAccountForm').on('click', '#editPass', e => {
+    $('#Password').attr('disabled', false);
+    if ($('#Password').attr('type') == 'text') {
+        $('#Password').attr('type', 'password');
+        $('#Password').attr('disabled', true);
+    } else {
+        $('#Password').attr('type', 'text');
+    }
 });

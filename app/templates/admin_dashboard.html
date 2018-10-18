@@ -23,11 +23,12 @@
             <div class="row">
                 <div id="confirmDelete" class="modal">
                     <div class="modal-content">
-                        <h4>Modal Header</h4>
-                        <p>A bunch of text</p>
+                        <i class="fas fa-info-circle fa-3x"></i>
+                        <h6><b>Are you sure you want to delete <span id="usernameToDelete"></span> account</b></h6>
                     </div>
                     <div class="modal-footer">
-                        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+                        <a href="#!" class="modal-close waves-effect waves-green btn">No</a>
+                        <a href="#!" class="modal-close waves-effect waves-green btn" id="deleteAccount">Yes</a>
                     </div>
                 </div>
             </div>
@@ -77,7 +78,6 @@
                                             </select>
                                             <label id="depError" class="helper-text"></label>
                                         </div>
-
                                     </div>
                                 </div>
                             </form>
@@ -92,6 +92,68 @@
                                 <a href="#!" class="waves-effect waves-green btn" id="saveAccount">Save</a>
                             </div>
 
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="editUser" class="modal">
+                        <div class="modal-content">
+                            <div class="row">
+                                <h4 class="center">Edit Account</h4>
+                            </div>
+                            <div class="row">
+                                <form class="col s12" id="editAccountForm">
+                                    <div class="row">
+                                        <div class="input-field col s6">
+                                            <div class="row">
+                                                <div class="col m8">
+                                                    <input disabled id="userName" type="text" class="validate" required>
+                                                    <span class="helper-text" data-error="Username is required"></span>
+                                                </div>
+                                                <div class="col m4">
+                                                    <a href="#!">
+                                                        <i class="fa fa-edit" id="editName"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="input-field col s6">
+                                            <div class="row">
+                                                <div class="col m8">
+                                                    <input disabled id="Password" type="password" class="validate">
+                                                    <span class="helper-text" data-error="Passwords should not be blank"></span>
+                                                </div>
+                                                <div class="col m4">
+                                                    <a href="#!">
+                                                        <i class="fa fa-edit" id="editPass"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="input-field col s6">
+                                            <input disabled id="userId" type="text" class="validate">
+                                            <span class="helper-text" data-error="User Id is required"></span>
+                                        </div>
+                                        <div class="input-field col s6">
+                                            <input disabled id="department" type="text" class="validate">
+                                            <span class="helper-text" data-error="User Id is required"></span>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="row">
+                                <div class="col m6">
+                                    <a href="#!" class="modal-close waves-effect waves-green btn" id="cancelEdit">Cancel</a>
+                                </div>
+                                <div class="col m6">
+                                    <a href="#!" class="waves-effect waves-green btn" id="editAccount">Save</a>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>

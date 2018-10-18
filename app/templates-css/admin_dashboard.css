@@ -2,7 +2,11 @@
     padding-left: 300px;
 }
 
-.modal-footer .btn {
+#editUser #createAccountForm .modal-footer .btn {
+    width: 100%;
+}
+
+#editUser .modal-footer .btn {
     width: 100%;
 }
 
@@ -18,13 +22,17 @@
     position: relative;
     padding: 10px;
     margin-top: 5px !important;
-    /* width: 100%; */
 }
 
 #a-float {
     opacity: 1 !important;
     transform: scale(0.8) !important;
 }
+
 .modal-footer {
     margin-bottom: 20px;
+}
+
+#confirmDelete {
+    width: 400px !important;
 }

@@ -7,6 +7,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../api/api');
 const should = chai.should();
+const bcrypt = require('bcrypt-nodejs');
 
 chai.use(chaiHttp);
 
@@ -170,7 +171,6 @@ describe('Test api can create user account', ()=>{
 
     it('should search for empaccounts and find none', done => {
         chai.request(server).get('/api/users').end((err, res) => {
-            console.log(err);
             res.should.have.status(200);
             res.body.should.be.a('array');
             res.body.length.should.be.eql(0);
@@ -233,5 +233,97 @@ describe('Test api can create user account', ()=>{
             res.body.message.Username.should.eql('hradmin');
             done();
         });
+    });
+});
+
+describe('Test api correctly edits an account', () => {
+    var testAccount = {
+        "Username": 'hradmin',
+        "Password": 'hradmin2018#',
+        "DepartmentId": 'HR001',
+        "EmployeeId": '29811079'
+    };
+    var accountId;
+
+    before(done => {
+        var ownerAccount = new Employee(testEmployee);
+        ownerAccount.save((err, saved) => {
+            if(err){
+                console.log(err);
+            }
+        });
+        var hash = bcrypt.hashSync(testAccount.Password);
+        testAccount.PasswordHash = hash;
+        var editAccount = new User(testAccount);
+        editAccount.save((err, saved) => {
+            if(err){
+                console.log(err);
+            }
+            accountId = saved._id;
+        });
+        done();
+    });
+    after(done => {
+        Employee.deleteMany({}, err => {
+            console.log(err);
+         });
+        User.deleteMany({}, err => {
+            console.log(err);
+        });
+        done();
+    });
+
+    it('should not edit an account with empty details', done => {
+        var erroneousDets = {
+            Username: '',
+            Password: ''
+        };
+        chai.request(server).
+            put('/api/user/' + accountId).
+            send(erroneousDets).
+            end((err, res) => {
+                res.should.have.status(400);
+                res.body.should.have.property('status').eql(false);
+                res.body.message.should.eql(
+                    ['Password is required',
+                        'Username is required',]);
+                done();
+            });
+    });
+
+    it('should not edit an account with erroneous details', done => {
+        var erroneousDets = {
+            Username: '1234##',
+            Password: 'hradm'
+        };
+        chai.request(server).
+            put('/api/user/' + accountId).
+            send(erroneousDets).
+            end((err, res) => {
+                res.should.have.status(400);
+                res.body.should.have.property('status').eql(false);
+                res.body.message.should.eql(
+                    ['Password should not be less than 8 characters',
+                        'Username should contain alphabet characters only',]);
+                done();
+            });
+    });
+
+    it('should edit the password or username only, correctly', done => {
+        var editDetails = {
+            'Username': 'hrmaster',
+            'Password': 'hrmaster2019'
+        };
+        chai.request(server).
+            put('/api/user/' + accountId).
+            send(editDetails).
+            end((err, res) => {
+                res.should.have.status(201);
+                res.body.should.have.property('status').eql(true);
+                res.body.message.Username.should.eql('hrmaster');
+                res.body.message.Password.should.eql('hrmaster2019');
+                res.body.message.EmployeeId.should.eql('29811079');
+                done();
+            });
     });
 });
