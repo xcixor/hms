@@ -288,3 +288,19 @@ ipc.on('edit-account', (event, args) => {
     };
     xhr.send(JSON.stringify(args[1]));
 });
+
+ipc.on('delete-account', (event, args) => {
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/user/' + args;
+    xhr.addEventListener("load", () => {
+        if (xhr.status == 200 || xhr.status == 500) {
+            var data = JSON.parse(xhr.responseText);
+            event.returnValue = data;
+        } else {
+            event.returnValue = { 'status': false, 'message': 'Error can not delete' };
+        }
+
+    });
+    xhr.open('DELETE', url);
+    xhr.send();
+});

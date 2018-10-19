@@ -301,6 +301,31 @@ $('#accountsData').on('click', 'i', e => {
             $('#accountsData a').removeClass('modal-trigger');
         }
     }
+    else if (accountId != undefined && btnClassName == 'material-icons fa fa-trash'){
+        var confirmAccRes = ipc.sendSync('get-account', accountId);
+        if (confirmAccRes.status == true){
+            $('#usernameToDelete').html(confirmAccRes.message.Username);
+            $('#deleteAccount').unbind().click(() => {
+                var deleteReply = ipc.sendSync('delete-account', accountId);
+                if(deleteReply.status == true){
+                    $('#' + accountId).empty();
+                    M.toast({ html: deleteReply.message, classes: 'rounded green toast-head' });
+                }else {
+                    $('#accountsData a').removeClass('modal-trigger');
+                    alert('That user is currently unavailable');
+                    $('#' + accountId).empty();
+                }
+            });
+        }else {
+            alert('That user is currently unavailable');
+            $('#accountsData a').removeClass('modal-trigger');
+            $('#' + accountId).empty();
+        }
+    }else {
+        alert('That user is currently unavailable');
+        $('#accountsData a').removeClass('modal-trigger');
+        $('#' + accountId).empty();
+    }
 });
 
 $('#editAccountForm').on('click', '#editName', e => {

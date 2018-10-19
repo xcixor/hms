@@ -12,3 +12,4 @@ npm --version
 npm install
 sleep 15
 npm test
+npm run coverage
