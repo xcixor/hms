@@ -23,12 +23,18 @@
             <div class="row">
                 <div id="confirmDelete" class="modal">
                     <div class="modal-content">
-                        <i class="fas fa-info-circle fa-3x"></i>
-                        <h6><b>Are you sure you want to delete <span id="usernameToDelete"></span> account</b></h6>
+                        <i class="fas fa-info-circle fa-3x red-text"></i>
+                        <h6><b>Are you sure you want to delete <span id="usernameToDelete"></span>'s account?</b></h6>
                     </div>
                     <div class="modal-footer">
-                        <a href="#!" class="modal-close waves-effect waves-green btn">No</a>
-                        <a href="#!" class="modal-close waves-effect waves-green btn" id="deleteAccount">Yes</a>
+                        <div class="row">
+                            <div class="col m6">
+                                <a href="#!" class="modal-close waves-effect waves-green btn">No</a>
+                            </div>
+                            <div class="col m6">
+                                <a href="#!" class="modal-close waves-effect waves-green btn" id="deleteAccount">Yes</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

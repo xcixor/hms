@@ -153,7 +153,11 @@ router.get('/user/:_id', (req, res) => {
         if (err) {
             res.status(500).send({ 'status': false, 'message': err });
         }else {
-            res.send({ 'status': true, 'message': account });
+            if(account){
+                res.send({ 'status': true, 'message': account });
+            }else{
+                res.send({ 'status': false, 'message': 'Account not found' });
+            }
         }
     });
 });
@@ -178,6 +182,21 @@ router.put('/user/:accountId', (req, res) => {
             res.status(201).send({ 'status': true, 'message': account });
         }
     });
+});
+
+router.delete('/user/:_id', (req, res) => {
+    User.findByIdAndRemove(req.params._id, (err, account) => {
+        if (err) {
+            res.status(500).send({ 'status': false, 'message': 'Operation for that user is currently unsuccessful' , 'error': err});
+        }else {
+            if (account){
+                res.status(200).send({ 'status': true, 'message': 'Successfuly deleted ' + account.Username });
+            }else {
+                res.status(404).send({ 'status': false, 'message': 'User not found' });
+            }
+        }
+    });
+
 });
 
 module.exports = router;

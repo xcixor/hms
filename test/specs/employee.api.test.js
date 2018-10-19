@@ -26,6 +26,7 @@ var testEmployee = {
 };
 
 describe('Test the Post route', ()=>{
+
     beforeEach(done => {
         Employee.deleteMany({}, err => {
             done();
@@ -80,6 +81,34 @@ describe('Test the Post route', ()=>{
 });
 });
 
+describe ('Test the get one route', () => {
+    before(done => {
+        var employee = new Employee(testEmployee);
+        employee.save((err, saved) => {
+            if (err) {
+                console.log(err);
+            }
+        });
+        done();
+    });
+    after(done => {
+        Employee.deleteMany({}, err => {
+            console.log(err);
+        });
+        done();
+    });
+    it('should get an employee based on NationalID', done => {
+        chai.request(server).get('/api/employee/' + testEmployee.NationalID).end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('status').eql(true);
+            res.body.message.Firstname.should.eql('Jimi');
+            res.body.message.Email.should.eql('av@g.com');
+            res.body.message.Status.should.eql(true);
+        });
+        done();
+    });
+});
+
 describe ('Test the delete route', ()=> {
     it('should get all the employees and find none', done => {
         chai.request(server).get('/api/employees').end((err, res) => {
@@ -105,6 +134,55 @@ describe ('Test the delete route', ()=> {
             res.body.should.have.property('message').eql('Successfuly deleted Jimi');
             done();
         });
+    });
+    it('should get all the employees and find none', done => {
+        chai.request(server).get('/api/employees').end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.be.a('array');
+            res.body.length.should.be.eql(0);
+            done();
+        });
+    });
+});
+
+describe('Test the delete all route', () => {
+    var testEmployee2 = {
+        "Firstname": "Peter",
+        "Lastname": "Njuguna",
+        "Surname": "Wanyinge",
+        "Email": "av@g.com",
+        "DateOfBirth": "11/03/1998",
+        "NationalID": "29811080",
+        "MobilePhoneNumber": "0712705444",
+        "Residence": "Mtito Andei",
+        "Gender": "Prefer not to disclose",
+        "DateOfHire": "3/4/2016",
+        "Status": true
+    };
+    before(done => {
+        var employee = new Employee(testEmployee);
+        employee.save((err, saved) => {
+            if (err) {
+                console.log(err);
+            }
+        });
+        var employee2 = new Employee(testEmployee2);
+        employee2.save((err, saved) => {
+            if (err) {
+                console.log(err);
+            }
+        });
+        done();
+    });
+
+    it('should delete all employees', done => {
+        chai.request(server).del('/api/employees')
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.have.property('status').eql(true);
+                res.body.should.have.property('message').eql('Deleted all employees');
+            });
+        done();
     });
     it('should get all the employees and find none', done => {
         chai.request(server).get('/api/employees').end((err, res) => {
@@ -260,8 +338,8 @@ describe('Test api correctly edits an account', () => {
                 console.log(err);
             }
             accountId = saved._id;
+            done();
         });
-        done();
     });
     after(done => {
         Employee.deleteMany({}, err => {
@@ -323,6 +401,68 @@ describe('Test api correctly edits an account', () => {
                 res.body.message.Username.should.eql('hrmaster');
                 res.body.message.Password.should.eql('hrmaster2019');
                 res.body.message.EmployeeId.should.eql('29811079');
+                done();
+            });
+    });
+});
+
+describe('Test the delete account route', ()=>{
+    var testEmployee2 = {
+        "Firstname": "Jimi",
+        "Lastname": "Mburi",
+        "Surname": "Wanyinge",
+        "Email": "av@g.com",
+        "DateOfBirth": "11/03/1998",
+        "NationalID": "29811079",
+        "MobilePhoneNumber": "0712705422",
+        "Residence": "Mtito Andei",
+        "Gender": "Prefer not to disclose",
+        "DateOfHire": "3/4/2016",
+        "Status": true
+    };
+
+    var testAccount = {
+        "Username": 'hradmin',
+        "Password": 'hradmin2018#',
+        "DepartmentId": 'HR001',
+        "EmployeeId": '29811079'
+    };
+    var accountId;
+
+    before(done => {
+        var ownerAccount = new Employee(testEmployee2);
+        ownerAccount.save().then(()=> {
+            var hash = bcrypt.hashSync(testAccount.Password);
+            testAccount.PasswordHash = hash;
+            var editAccount = new User(testAccount);
+            editAccount.save((err, saved) => {
+                accountId = saved._id;
+                done();
+            });
+        });
+    });
+    after(done => {
+        Employee.deleteMany({}, err => {
+            console.log(err);
+        });
+        done();
+    });
+
+    it('should delete an account successfuly', done => {
+        chai.request(server).del('/api/user/'+ accountId).
+            end((err, res) =>{
+                res.should.have.status(200);
+                res.body.should.have.property('status').eql(true);
+                res.body.should.have.property('message').eql('Successfuly deleted hradmin');
+                done();
+        });
+    });
+    it('should not crash if account is unavailable', done => {
+        chai.request(server).del('/api/user/' + 1243434).
+            end((err, res) => {
+                res.should.have.status(500);
+                res.body.should.have.property('status').eql(false);
+                res.body.should.have.property('message').eql('Operation for that user is currently unsuccessful');
                 done();
             });
     });
