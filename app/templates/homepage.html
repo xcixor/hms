@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link type="text/css" rel="stylesheet" href="../../node_modules/materialize-css/dist/css/materialize.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="../templates-css/homepage.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="../font-awesome/css/all.css" />
+</head>
+
+<body>
+    <div class="content main-content">
+        <nav>
+            <div class="nav-wrapper  blue darken-4">
+                <a class="brand-logo center">Hotel Management System</a>
+            </div>
+        </nav>
+        <div class="container mini-container">
+            <div class="row z-depth-1 head-content">
+                <div class="col m4">
+                    <p class="right">Ken's Hotel</p>
+                </div>
+                <div class="col m4">
+                    <p class="center">Something</p>
+                </div>
+                <div class="col m4">
+                    <p class="left">Another Thing</p>
+                </div>
+            </div>
+            <div class="row 1 body-display">
+                <div class="row row-one">
+                    <div class="col m4">
+                        <div class="col-content z-depth-1">
+                            <div class="col-content-content center">
+                                <div>
+                                <i class="fas fa-cogs fa-3x green-text"></i>
+                                <p class="purple-text">Settings</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col m4">
+                        <div class="col-content z-depth-1">
+                            <div class="col-content-content center">
+                                <i class="fas fa-sign-in-alt fa-3x green-text" id="loginIcon"></i>
+                                <p class="purple-text">Login to your workspace</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col m4">
+                        <div class="col-content z-depth-1"></div>
+                    </div>
+                </div>
+                <div class="row row-two">
+                    <div class="col m4">
+                        <div class="col-content z-depth-1">
+                            <div class="col-content-content center">
+                                <i class="far fa-question-circle fa-3x green-text"></i>
+                                <p class="purple-text">Help</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col m4">
+                        <div class="col-content z-depth-1"></div>
+                    </div>
+                    <div class="col m4">
+                        <div class="col-content z-depth-1"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row footer center">
+                <div class="col m4">
+                <p id="time"></p>
+                </div>
+                <div class="col m4">
+                    <p>hotel management system</p>
+                </div>
+                <div class="col m4">
+                    <p>
+                    <span>&copy;</span>pndungu@gmail.com
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>window.$ = window.jQuery = require('jquery');</script>
+    <script>window.materialize = window.materialize = require('materialize-css');</script>
+    <script>
+        require('../../renderers/homepageRenderer.js');
+    </script>
+    <script type="text/javascript" src="../templates_js/materialize_init.js"></script>
+</body>
+
+</html>

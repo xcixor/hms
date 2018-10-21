@@ -1,9 +1,23 @@
 const {Menu} = require('electron');
 const electron = require('electron');
 const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
+
 
 // create the menu template
-let template = [{
+let template = [
+    {
+        label: 'File',
+        submenu: [{
+            label: 'Home',
+            accelerator: process.platform == 'CmdOrCtrl+H',
+            click(event){
+                const focusedWindow = BrowserWindow.getFocusedWindow();
+                focusedWindow.webContents.send('home-page');
+            }
+        }]
+    },
+    {
     label: 'Edit',
     submenu: [
         {

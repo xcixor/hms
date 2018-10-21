@@ -345,3 +345,7 @@ $('#editAccountForm').on('click', '#editPass', e => {
         $('#Password').attr('type', 'text');
     }
 });
+
+ipc.on('home-page', e => {
+    ipc.sendSync('home-page');
+});

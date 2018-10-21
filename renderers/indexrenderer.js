@@ -19,3 +19,11 @@ loginBtn.addEventListener('click', ()=>{
     ipc.sendSync('user-login');
     ipc.send('retrieve-employees');
 });
+
+ipc.on('home-page', e => {
+    ipc.sendSync('home-page');
+});
+
+$('#homepage').click( e => {
+    ipc.sendSync('home-page');
+});

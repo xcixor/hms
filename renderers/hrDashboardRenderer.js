@@ -346,6 +346,9 @@ $('#printEmployee').click( e => {
     delete global.btoa;
 });
 
+ipc.on('home-page', e => {
+    ipc.sendSync('home-page');
+});
 
 // // to implement when searching
 // document.getElementById('searchInputField').addEventListener('keypress', e =>{
