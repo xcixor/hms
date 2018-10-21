@@ -10,7 +10,7 @@ const app = electron.app;
 const ipc = electron.ipcMain;
 
 // reload module
-// require('electron-reload')(__dirname);
+require('electron-reload')(__dirname);
 
 // module to create native browser window
 const BrowserWindow = electron.BrowserWindow;
@@ -27,7 +27,7 @@ const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 
 let splashWindow = require('./app/windows/splashWindow');
 
-let mainWindow = require('./app/windows/mainWindow');
+let loginWindow = require('./app/windows/mainWindow');
 
 let adminLogin = require('./app/windows/adminLogin');
 
@@ -36,6 +36,10 @@ let adminDashboard = require('./app/windows/adminDashboard');
 let accountWindow = require('./app/windows/userCreation');
 
 let hrWindow = require('./app/windows/hrWindow');
+
+let homepage = require('./app/windows/homepage');
+
+let mainWindow;
 
 function createWindow(screen) {
     // create the browser window
@@ -98,7 +102,7 @@ ipc.on('app-init', () => {
 
         }, -500);
     }
-    mainWindow = createWindow(mainWindow);
+    mainWindow = createWindow(loginWindow);
     require('./app/windows/mainmenu');
 });
 
@@ -106,7 +110,6 @@ ipc.on('app-init', () => {
 ipc.on('show-context-menu', function (event) {
     const win = BrowserWindow.fromWebContents(event.sender);
     contextMenu.popup(win);
-    // contextMenu.getMenuItemById()
 });
 
 ipc.on('pop-up-admin-window', ()=> {
@@ -143,6 +146,14 @@ ipc.on('open-create-account-window', ()=>{
 ipc.on('user-login', (event, args)=>{
     changeView(mainWindow, hrWindow);
     event.returnValue = 'success';
+});
+
+ipc.on('home-page', (event, args) => {
+    changeView(mainWindow, homepage);
+});
+
+ipc.on('open-login-page', e => {
+    changeView(mainWindow, loginWindow);
 });
 
 ipc.on('create-user', (event, args)=>{

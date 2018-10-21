@@ -1,0 +1,63 @@
+.head-content {
+    margin-top: 50px;
+    height: 150px;
+    margin-bottom: 50px;
+}
+
+.head-content .col {
+    text-transform: uppercase;
+    height: 100%;
+}
+
+.head-content p {
+    line-height: 150px;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.row-one {
+    height: 250px;
+}
+
+.row-one .col {
+    height: 100%;
+}
+
+.col-content {
+    height: 100%;
+    padding: 60px;
+}
+
+.col-content-content {
+    height: 100%;
+    width: 100%;
+}
+
+.col-content-content i {
+    line-height: 100px;
+}
+
+.row-two {
+    height: 250px;
+}
+
+.row-two .col {
+    height: 100%;
+}
+
+.footer {
+    margin-top: 100px;
+    flex-shrink: 0;
+}
+
+.mini-content {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+i {
+    cursor: pointer;
+}
