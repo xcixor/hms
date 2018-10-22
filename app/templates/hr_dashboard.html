@@ -17,28 +17,53 @@
                <div class="row">
                    <h5 class="center">Employees Currently Registered</h5>
                </div>
-            <!-- <div class="container center" id="searchContainer">
-                <div class="row" id="searchRow">
-                    <div class="col m2"></div>
-                    <div class="col m8">
-                        <nav>
-                            <div class="nav-wrapper">
-                                <form>
-                                    <div class="input-field" id="searchInputField">
-                                        <input id="search" type="search" required>
-                                        <label class="label-icon" for="search"><i class="fa fa-search"></i></label>
-                                        <i class="material-icons fa fa-times-circle"></i>
+            </div>
+            <div class="row departments">
+                <div class="row" id="departmentData">
+                    <div class="row">
+                        <h5>Departments</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="departmentModal" class="modal">
+                        <div class="modal-content">
+                            <h4>Create Department</h4>
+                            <div class="row">
+                                <form class="col s12" id="addDepartment">
+                                    <div class="row">
+                                        <div class="input-field col s12">
+                                            <input id="name" type="text" class="validate">
+                                            <label for="name">Department Name</label>
+                                            <span class="helper-text" data-error="Department Name is required"></span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="input-field col s12" id="deptHod">
+                                            <span class="helper-text" data-error="Department Id is required" id="depError"></span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="input-field col s12">
+                                            <input id="deptId" type="text" class="validate">
+                                            <label for="deptId">Department Id</label>
+                                            <span class="helper-text" data-error="Department Id is required"></span>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
-                        </nav>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="row">
+                                <div class="col s6">
+                                    <a href="#!" class="modal-close waves-effect waves-green btn" id="cancelDept">Cancel</a>
+                                </div>
+                                <div class="col s6">
+                                    <a href="#!" class="waves-effect waves-green btn" id="saveDept">Save</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col m2"></div>
                 </div>
-            </div> -->
-            </div>
-            <div class="row departments">
-                <p id="sentMessage"></p>
             </div>
             <div class="side-menu">
                 <ul id="slide-out" class="sidenav sidenav-fixed">
@@ -61,7 +86,7 @@
                         <div class="divider"></div>
                     </li>
                     <li><a class="subheader red-text">Department Actions</a></li>
-                    <li><a class="waves-effect white-text" href="#!">Create A Department</a></li>
+                    <li><a class="waves-effect white-text modal-trigger" href="#departmentModal" id="openDeptModal">Create A Department</a></li>
                     <li><a class="waves-effect white-text" href="#!">View A Department Details</a></li>
                     <li><a class="waves-effect white-text" href="#!">Update A Department Details</a></li>
                     <li><a class="waves-effect white-text" href="#!">Delete A Department</a></li>

@@ -2,6 +2,7 @@ process.env.NODE_ENV = 'test';
 const mongoose = require('mongoose');
 const Employee = require('../../api/models/employee.model');
 const User = require('../../api/models/user.model');
+const Department = require('../../api/models/departments.model');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -10,6 +11,13 @@ const should = chai.should();
 const bcrypt = require('bcrypt-nodejs');
 
 chai.use(chaiHttp);
+
+var department = {
+    "Name" : "Human Resource",
+    "HOD": "29811079",
+    "Id": "29811079"
+};
+
 
 var testEmployee = {
     "Firstname": "Jimi",
@@ -463,6 +471,106 @@ describe('Test the delete account route', ()=>{
                 res.should.have.status(500);
                 res.body.should.have.property('status').eql(false);
                 res.body.should.have.property('message').eql('Operation for that user is currently unsuccessful');
+                done();
+            });
+    });
+});
+
+describe('Test post department route', ()=> {
+    before(done => {
+        var ownerAccount = new Employee(testEmployee);
+        ownerAccount.save().then( ()=> {
+            Department.deleteMany({}, () => {
+                done();
+            });
+        });
+    });
+    after(done => {
+        Employee.deleteMany({}).then( ()=> {
+            Department.deleteMany({}, () => {
+                done();
+            });
+        });
+        done();
+    });
+    it('should not create a department without all the details', done =>{
+        var testDept = {
+            "Name": "Human Resource",
+            "HOD": "29811079"
+        };
+
+        chai.
+        request(server).
+        post('/api/departments').
+        send(testDept).
+        end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property('status').eql(false);
+            res.body.should.have.property('message').
+            eql(['The department\'s Id is required']);
+            done();
+        });
+    });
+    it('should not create a department with invalid data', done => {
+        var testDept = {
+            "Name": 12354,
+            "HOD": "29811079",
+            "Id": "HR001"
+        };
+
+        chai.
+            request(server).
+            post('/api/departments').
+            send(testDept).
+            end((err, res) => {
+                res.should.have.status(400);
+                res.body.should.have.property('status').eql(false);
+                res.body.should.have.property('message').
+                    eql(['Department name should contain alphabet characters only']);
+                done();
+            });
+    });
+    it('should not create a non existent HOD', done => {
+        var testDept = {
+            "Name": "Sales and Marketing",
+            "HOD": "2349890943434",
+            "Id": "SM002"
+        };
+
+        chai.
+            request(server).
+            post('/api/departments').
+            send(testDept).
+            end((err, res) => {
+                res.should.have.status(400);
+                res.body.should.have.property('status').eql(false);
+                res.body.should.have.property('message').
+                    eql(['There is no such an employee in our database']);
+                done();
+            });
+    });
+    it('should create a department with valid data successfuly', done => {
+        chai.
+            request(server).
+            post('/api/departments').
+            send(department).
+            end((err, res) => {
+                res.should.have.status(201);
+                res.body.should.have.property('status').eql(true);
+                res.body.message.Name.should.eql('Human Resource');
+                done();
+            });
+    });
+    it('should not create the same department twice', done => {
+        chai.
+            request(server).
+            post('/api/departments').
+            send(department).
+            end((err, res) => {
+                res.should.have.status(409);
+                res.body.should.have.property('status').eql(false);
+                res.body.should.have.property('message').
+                    eql(['A department with a similar name is already created']);
                 done();
             });
     });
