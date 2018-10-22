@@ -192,6 +192,17 @@ ipc.on('retrieve-employees', (event, args)=>{
     });
 });
 
+ipc.on('retrieve-departments', (event, args) => {
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/departments';
+    xhr.addEventListener("load", () => {
+        var data = JSON.parse(xhr.responseText);
+        event.sender.send('department-data-reloaded', data);
+    });
+    xhr.open('GET', url);
+    xhr.send();
+});
+
 ipc.on('retrieve-employees-sync', (event, args) => {
     loadEmployees((data) => {
         event.returnValue = data;
@@ -314,4 +325,22 @@ ipc.on('delete-account', (event, args) => {
     });
     xhr.open('DELETE', url);
     xhr.send();
+});
+
+ipc.on('create-department', (event, args) => {
+    console.log(args + 'args');
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/departments';
+    xhr.open('POST', url, true);
+    xhr.onreadystatechange = function () {
+        //Call a function when the state changes.
+        if (this.readyState == XMLHttpRequest.DONE || this.status == 201 || this.status == 400 || this.status == 409 || this.status == 500) {
+            event.returnValue = JSON.parse(this.responseText);
+        } else {
+            console.log(this.responseText);
+        }
+    };
+    //Send the proper header information along with the request
+    xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+    xhr.send(JSON.stringify(args));
 });

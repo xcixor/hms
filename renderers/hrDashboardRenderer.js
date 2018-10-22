@@ -5,6 +5,10 @@ var moment = require('moment');
 var jsPDF = require('jspdf');
 require('jspdf-autotable');
 
+$(document).ready(function () {
+    ipc.send('retrieve-departments');
+});
+
 const saveBtn = document.getElementById('saveUserBtn');
 saveBtn.addEventListener('click', ()=>{
     var firstName = document.getElementById('first_name').value;
@@ -55,7 +59,12 @@ ipc.on('receive-reloaded-employees', (event, args)=>{
     console.log('Hurray!');
 });
 
-ipc.on('receive-employees', (event, args) =>{
+ipc.on('department-data-reloaded', (event, args) =>{
+    var ul = createDepUlData(args);
+    $('#departmentData').append(ul.Ul);
+});
+
+ipc.on('receive-employees', (event, args) => {
     const empRow = document.getElementById('employees');
     var ul = createEmployeeUl(args);
     empRow.appendChild(ul);
@@ -349,6 +358,200 @@ $('#printEmployee').click( e => {
 ipc.on('home-page', e => {
     ipc.sendSync('home-page');
 });
+
+function createSelect (employees){
+    var select = $('<select></select>');
+    select.attr('id', 'hod');
+    var option1 = $('<option></option>');
+    option1.attr('value', " ");
+    option1.attr('disabled', true);
+    option1.attr("selected", true);
+    option1.html('HOD');
+    select.append(option1);
+
+    for (var i = 0, len = employees.length; i < len; i++) {
+        var opt = $('<option></option>');
+        opt.attr('value', i);
+        opt.html(employees[i].NationalID);
+        select.append(opt);
+    }
+    return select;
+}
+
+$('#openDeptModal').unbind().click(e => {
+    var employees = ipc.sendSync('retrieve-employees-sync');
+    var select = createSelect(employees);
+    $('#deptHod').prepend(select);
+    $(document).ready(e => {
+        $('select').formSelect();
+    });
+});
+
+function validateDepartmentForm(){
+    var department = {};
+    var errors = [];
+    var name = $('#addDepartment').find('#name').val();
+    var hod = $('#addDepartment').find('#hod').val();
+    var deptId = $('#addDepartment').find('#deptId').val();
+    if (name == "" || !name.trim()) {
+        $("#name").addClass("invalid");
+        $("#name").prop("aria-invalid", "true");
+        errors.push('Name is empty');
+    } else {
+        department.Name = name;
+    }
+    if (deptId == "" || !deptId.trim()) {
+        $("#deptId").addClass("invalid");
+        $("#deptId").prop("aria-invalid", "true");
+        errors.push('Department Id is empty');
+    } else {
+        department.Id = deptId;
+    }
+    if (hod === null) {
+        $('#depError').html('Head of department is required').addClass('red-text');
+        errors.push('HOD is blank');
+    } else {
+        var departmentValue = $('#addDepartment').find('#hod option:selected').text();
+        department.HOD = departmentValue;
+    }
+    return { 'department': department, 'errors': errors };
+}
+
+$('#saveDept').unbind().click(e => {
+    var formValidation = validateDepartmentForm();
+    if(formValidation.errors.length == 0){
+        var createDep = ipc.sendSync('create-department', formValidation.department);
+        if(createDep.status == true){
+            var ul = $('#departmentsList');
+            var li = createDepartmentLiData(createDep.message);
+            ul.append(li);
+            $('#addDepartment').trigger('reset');
+            $('.select-wrapper').remove();
+            $(document).ready(function () {
+                $('.modal').modal('close');
+            });
+            setTimeout(() => {
+                M.toast({ html: createDep.message.Name + ' department successfuly created', classes: 'rounded green toast-head' });
+            }, 500);
+        }else {
+            console.log(createDep.message);
+            M.toast({ html: "There are errors in the form, Please check ther errors below", classes: 'rounded red toast-head' });
+            for (var i = 0, len = createDep.message.length; i < len; i++) {
+                M.toast({ html: createDep.message[i], classes: 'rounded red black-text' });
+            }
+        }
+    }else {
+        M.toast({ html: "The form cannot be submitted at the moment", classes: 'rounded red toast-head' });
+    }
+});
+$('#cancelDept').unbind().click(e => {
+    $('.select-wrapper').remove();
+});
+
+function createDepartmentLiData(args){
+    var depNodes = [];
+    var depVarsToDisplay = [];
+    var cols = [];
+    depVarsToDisplay.push(args.Name);
+    depVarsToDisplay.push(args.Id);
+    depVarsToDisplay.push(args.HOD);
+    depVarsToDisplay.forEach((varToDisplay) => {
+        var data = document.createTextNode(varToDisplay);
+        depNodes.push(data);
+    });
+    depNodes.forEach((node) => {
+        const col = document.createElement('div');
+        col.className = 'col m3 data-value';
+        col.appendChild(node);
+        cols.push(col);
+    });
+    var row = $('<div></div>');
+    row.addClass('row emp-data');
+    row.attr('id', args._id);
+    $('document').ready(() => {
+        $('.fixed-action-btn').floatingActionButton();
+        var elems = document.querySelectorAll('.fixed-action-btn');
+        var instances = M.FloatingActionButton.init(elems, {
+            direction: 'left'
+        });
+    });
+    var btnDiv = createFloatingBtn(args._id);
+    row.append(btnDiv);
+    cols.forEach((col) => {
+        row.append(col);
+    });
+
+    const li = $('<li></li>');
+    li.id = args._id;
+    li.append(row);
+    return li;
+}
+
+function createDepUlData(args) {
+    var rowIds = [];
+    var ul = $('<ul>').attr('id', 'departmentsList');
+    var rows = [];
+    var lis = [];
+    args.forEach(department => {
+        var depNodes = [];
+        var cols = [];
+        var depVarsToDisplay = [];
+        depVarsToDisplay.push(department.Name);
+        depVarsToDisplay.push(department.Id);
+        depVarsToDisplay.push(department.HOD);
+        depVarsToDisplay.forEach(varToDisplay => {
+            var data = document.createTextNode(varToDisplay);
+            depNodes.push(data);
+        });
+        depNodes.forEach(node => {
+            const col = $('<div></div>');
+            col.addClass('col m3 data-value');
+            col.append(node);
+            cols.push(col);
+        });
+        const row = $('<div></div>');
+        row.addClass('row emp-data');
+        row.attr('id', department._id);
+        $('document').ready(function () {
+            $('.fixed-action-btn').floatingActionButton();
+            var elems = document.querySelectorAll('.fixed-action-btn');
+            var instances = M.FloatingActionButton.init(elems, {
+                direction: 'left'
+            });
+        });
+        row.append(createFloatingBtn(department._id));
+
+        cols.forEach(col => {
+            row.append(col);
+        });
+        rows.push(row);
+    });
+    rows.forEach((row) => {
+        const li = $('<li>');
+        li.attr('id', row.id).attr('id', row.attr('id'));
+        li.append(row);
+        var id = row.attr('id');
+        rowIds.push(id);
+        lis.push(li);
+    });
+    lis.forEach((li) => {
+        ul.append(li);
+    });
+    return { 'Ul': ul, 'Ids': rowIds };
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // // to implement when searching
 // document.getElementById('searchInputField').addEventListener('keypress', e =>{

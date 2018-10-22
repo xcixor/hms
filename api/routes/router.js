@@ -6,8 +6,9 @@ const Employee = require('../models/employee.model');
 
 const User = require('../models/user.model');
 
-const bcrypt = require('bcrypt-nodejs');
+const Department = require('../../api/models/departments.model');
 
+const bcrypt = require('bcrypt-nodejs');
 
 // create a new employee resource
 router.post('/employees', (req, res)=>{
@@ -117,7 +118,6 @@ router.post('/user', (req, res) => {
                                     });
                                     res.status(400).send({ 'status': false, 'message': accountErrors });
                                 } else {
-                                    // res.status(201).send({ 'status': true, 'message': userName + '\'s' + ' account has successfuly been created' });
                                     res.status(201).send({ 'status': true, 'message': emp });
                                 }
                             });
@@ -164,7 +164,7 @@ router.get('/user/:_id', (req, res) => {
 
 router.put('/user/:accountId', (req, res) => {
     var accountErrors = [];
-    var opts = { new: true, upsert: false, setDefaultsOnInsert: true, runValidators: true }
+    var opts = { new: true, upsert: false, setDefaultsOnInsert: true, runValidators: true };
     var hash = bcrypt.hashSync(req.body.Password);
     req.body.PasswordHash = hash;
     User.findByIdAndUpdate({ _id: req.params.accountId }, req.body, opts, (err, account) => {
@@ -197,6 +197,52 @@ router.delete('/user/:_id', (req, res) => {
         }
     });
 
+});
+
+router.post('/departments', (req, res) => {
+    var departmentErrors = [];
+    Employee.findOne({NationalID: req.body.HOD}, (err, employee) => {
+        if (err){
+            res.status(500).send({'status': false, 'message': err});
+        }else {
+            if(employee){
+                Department.find({'Name': req.body.Name}, (err, department) => {
+                    if(err){
+                        res.status(500).send({'status': false, 'message': err});
+                    }else {
+                        if(department.length == 0){
+                            var dept = new Department(req.body);
+                            dept.save((err, dept) => {
+                                if (err){
+                                    Object.keys(err.errors).forEach(key => {
+                                        departmentErrors.push(err.errors[key].message);
+                                    });
+                                    res.status(400).send({ 'status': false, 'message': departmentErrors});
+                                }else {
+                                    res.status(201).send({'status': true, 'message': dept});
+                                }
+                            });
+                        }else {
+                            departmentErrors.push('A department with a similar name is already created');
+                            res.status(409).send({ 'status': false, 'message': departmentErrors});
+                        }
+                    }
+                });
+            }else {
+                departmentErrors.push('There is no such an employee in our database');
+                res.status(400).send({ 'status': false, 'message': departmentErrors});
+            }
+        }
+    });
+});
+
+router.get('/departments', (req, res) => {
+    Department.find({}, (err, departments) => {
+        if (err) {
+            res.status(400).send(err);
+        }
+        res.status(200).send(departments);
+    });
 });
 
 module.exports = router;
