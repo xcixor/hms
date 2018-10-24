@@ -6,7 +6,10 @@ var jsPDF = require('jspdf');
 require('jspdf-autotable');
 
 $(document).ready(function () {
-    ipc.send('retrieve-departments');
+    ipc.send('retrieve-employees');
+    setTimeout(()=>{
+        ipc.send('retrieve-departments');
+    }, 100);
 });
 
 const saveBtn = document.getElementById('saveUserBtn');
@@ -60,19 +63,23 @@ ipc.on('receive-reloaded-employees', (event, args)=>{
 });
 
 ipc.on('department-data-reloaded', (event, args) =>{
+    $(document).ready(() => { });
     var ul = createDepUlData(args);
     $('#departmentData').append(ul.Ul);
 });
 
 ipc.on('receive-employees', (event, args) => {
-    const empRow = document.getElementById('employees');
-    var ul = createEmployeeUl(args);
-    empRow.appendChild(ul);
+    $(document).ready(()=> {
+        const empRow = document.getElementById('employees');
+        var ul = createEmployeeUl(args);
+        empRow.appendChild(ul);
+    });
+
 });
 
-ipc.on('reload-employees', (event, args) =>{
-    ipc.send('retrieve-employees');
-});
+// ipc.on('reload-employees', (event, args) =>{
+//     ipc.send('retrieve-employees');
+// });
 
 function createEmployeeLi(args){
     var empNodes = [];
@@ -99,7 +106,14 @@ function createEmployeeLi(args){
     row.className = 'row emp-data';
     row.id = args.NationalID;
 
-    var btnDiv = createFloatingBtn(args.NationalID);
+    $('document').ready(() => {
+        $('.fixed-action-btn').floatingActionButton();
+        var elems = document.querySelectorAll('.fixed-action-btn');
+        var instances = M.FloatingActionButton.init(elems, {
+            direction: 'left'
+        });
+    });
+    var btnDiv = createFloatingBtn(args.NationalID, 'deleteEmpFab');
     row.appendChild(btnDiv);
 
 
@@ -112,7 +126,7 @@ function createEmployeeLi(args){
     return li;
 }
 
-function createFloatingBtn(elementId){
+function createFloatingBtn(iId, aId){
     var btnDiv = document.createElement('div');
     btnDiv.className = 'fixed-action-btn right';
 
@@ -130,10 +144,10 @@ function createFloatingBtn(elementId){
     var delA = document.createElement('a');
     delA.className = 'btn-floating red modal-trigger';
     // delA.className = 'btn-floating red';
-    delA.id = 'confirmDel';
+    delA.id = aId;
     delA.setAttribute('href', '#confirmDelete');
     var btnI = document.createElement('i');
-    btnI.id = elementId;
+    btnI.id = iId;
     btnI.className = 'fa fa-trash';
     btnI.setAttribute('title', 'Delete');
     delA.appendChild(btnI);
@@ -144,9 +158,10 @@ function createFloatingBtn(elementId){
     var editA = document.createElement('a');
     editA.className = 'btn-floating red modal-trigger';
     editA.setAttribute('href', '#editUser');
+    editA.id = aId;
     var btnI2 = document.createElement('i');
     btnI2.className = 'fa fa-edit';
-    btnI2.id = elementId;
+    btnI2.id = iId;
     btnI2.setAttribute('title', 'edit');
     editA.appendChild(btnI2);
     editLi.appendChild(editA);
@@ -191,7 +206,15 @@ function createEmployeeUl(args){
         const row = document.createElement('div');
         row.className = 'row emp-data';
         row.id = emp.NationalID;
-        var btnDiv = createFloatingBtn(emp.NationalID);
+
+        $('document').ready(() => {
+            $('.fixed-action-btn').floatingActionButton();
+            var elems = document.querySelectorAll('.fixed-action-btn');
+            var instances = M.FloatingActionButton.init(elems, {
+                direction: 'left'
+            });
+        });
+        var btnDiv = createFloatingBtn(emp.NationalID, 'deleteEmpFab');
         row.appendChild(btnDiv);
         cols.forEach((col) => {
             row.appendChild(col);
@@ -210,112 +233,155 @@ function createEmployeeUl(args){
     });
     return ul;
 }
+function executeDelete (message, args) {
+    var reply;
+    reply = ipc.sendSync(message, args);
+    return reply;
+}
 
-$(document).ready( () => {
-    var natId;
-    var className;
-    $("i").click(event => {
+$(".content").on('click', 'i' , event => {
+        var natId;
+        var className;
+        var parent = event.target.parentElement;
+        var parentId = parent.id;
         natId = event.target.id;
         className = event.target.className;
-        if(natId != undefined && className == 'fa fa-trash'){
-            const reply = ipc.sendSync('get-employee', natId);
-            document.getElementById('empToDeleteName').innerHTML = reply.message.Firstname;
-            document.getElementById('deleteUser').addEventListener('click', ()=> {
-                var delReply = ipc.sendSync('delete-employee', natId);
-                if (delReply.status == true){
-                    var row = document.getElementById(natId);
-                    row.parentNode.removeChild(row);
-                    M.toast({ html: delReply.message, classes: 'rounded green toast-head' });
-                }
-                document.getElementById('empToDeleteName').innerHTML = '';
-                natId = '';
-            });
-        }
-        else if(natId != undefined && className == 'fa fa-edit'){
-            const reply = ipc.sendSync('get-employee', natId);
-            var fName = $('#empEditForm').find('#first_name').val(reply.message.Firstname);
-            var sName = $('#empEditForm').find('#surname').val(reply.message.Surname);
-            var lName = $('#empEditForm').find('#last_name').val(reply.message.Lastname);
-            var email = $('#empEditForm').find('#email').val(reply.message.Email);
-            var dob = $('#empEditForm').find('#dob').val(reply.message.DateOfBirth);
-            var nationalId = $('#empEditForm').find('#national_id').val(reply.message.NationalID);
-            var tel = $('#empEditForm').find('#tel').val(reply.message.MobilePhoneNumber);
-            var residence = $('#empEditForm').find('#residence').val(reply.message.Residence);
-            var address = $('#empEditForm').find('#address').val(reply.message.Address);
-            var genderOption;
-            switch(reply.message.Gender){
-                case "Male":
-                    genderOption = "1";
-                    break;
-                case "Female":
-                    genderOption = "2";
-                    break;
-            }
-            var gender = $('#empEditForm').find('#gender').val(genderOption).trigger('change');
-            var doh = $('#empEditForm').find('#doh').val(reply.message.DateOfHire);
-            var statusOption;
-            switch (reply.message.Status) {
-                case true:
-                    statusOption = "1";
-                    break;
-                case false:
-                    statusOption = "2";
-                    break;
-            }
-            var status = $('#empEditForm').find('#status').val(statusOption).trigger('change');
+        if (natId != undefined){
+            if(parentId =='deleteEmpFab'){
+                if (className == 'fa fa-trash') {
+                    const reply = ipc.sendSync('get-employee', natId);
+                    document.getElementById('empToDeleteName').innerHTML = reply.message.Firstname;
+                    $('#deleteUser').unbind().click(() =>{
+                        var delReply = executeDelete('delete-employee', natId);
+                        if (delReply.status == true) {
+                            var row = document.getElementById(natId);
+                            row.parentNode.removeChild(row);
+                            M.toast({ html: delReply.message, classes: 'rounded green toast-head' });
+                            document.getElementById('empToDeleteName').innerHTML = '';
+                            natId = '';
+                            className = '';
+                        }else{
+                            M.toast({ html: delReply.message, classes: 'rounded red toast-head' });
+                            natId = '';
+                            className = '';
+                        }
 
-            // edit user
-            $('#editUserBtn').click( event =>{
-                var newFName = fName.val();
-                var newLName = lName.val();
-                var newSName = sName.val();
-                var newEmail = email.val();
-                var newDob = dob.val();
-                var newNatId = nationalId.val();
-                var newTel = tel.val();
-                var newResidence = residence.val();
-                var newAddress = address.val();
-                var newGender = $('#empEditForm').find('#gender option:selected').text();
-                var newDoh = doh.val();
-                var newStatus = $('#empEditForm').find('#status option:selected').text();
-                var editStatus;
-                switch (newStatus) {
-                    case "Active":
-                        editStatus = true;
-                        break;
-                    case "Inactive":
-                        editStatus = false;
-                        break;
-                }
-                var newEmpDetails = {
-                    "Firstname": newFName,
-                    "Lastname": newLName,
-                    "Surname": newSName,
-                    "Email": newEmail,
-                    "DateOfBirth": newDob,
-                    "NationalID": newNatId,
-                    "MobilePhoneNumber": newTel,
-                    "Residence": newResidence,
-                    "Address": newAddress,
-                    "Gender": newGender,
-                    "DateOfHire": newDoh,
-                    "Status": editStatus
-                };
-                var editResponse = ipc.sendSync('edit-employee', [natId, newEmpDetails]);
-                if(editResponse.status == true){
-                    $(document).ready(function () {
-                        $('.modal').modal('close');
-                        var empData = editResponse.message;
-                        var linkToRemove = document.getElementById(natId);
-                        linkToRemove.parentNode.removeChild(linkToRemove);
-                        var li = createEmployeeLi(empData);
-                        const empList = document.getElementById('empList');
-                        empList.appendChild(li);
                     });
                 }
-            });
+                else if (className == 'fa fa-edit') {
+                    const reply = ipc.sendSync('get-employee', natId);
+                    var fName = $('#empEditForm').find('#first_name').val(reply.message.Firstname);
+                    var sName = $('#empEditForm').find('#surname').val(reply.message.Surname);
+                    var lName = $('#empEditForm').find('#last_name').val(reply.message.Lastname);
+                    var email = $('#empEditForm').find('#email').val(reply.message.Email);
+                    var dob = $('#empEditForm').find('#dob').val(reply.message.DateOfBirth);
+                    var nationalId = $('#empEditForm').find('#national_id').val(reply.message.NationalID);
+                    var tel = $('#empEditForm').find('#tel').val(reply.message.MobilePhoneNumber);
+                    var residence = $('#empEditForm').find('#residence').val(reply.message.Residence);
+                    var address = $('#empEditForm').find('#address').val(reply.message.Address);
+                    var genderOption;
+                    switch (reply.message.Gender) {
+                        case "Male":
+                            genderOption = "1";
+                            break;
+                        case "Female":
+                            genderOption = "2";
+                            break;
+                    }
+                    var gender = $('#empEditForm').find('#gender').val(genderOption).trigger('change');
+                    var doh = $('#empEditForm').find('#doh').val(reply.message.DateOfHire);
+                    var statusOption;
+                    switch (reply.message.Status) {
+                        case true:
+                            statusOption = "1";
+                            break;
+                        case false:
+                            statusOption = "2";
+                            break;
+                    }
+                    var status = $('#empEditForm').find('#status').val(statusOption).trigger('change');
+
+                    // edit user
+                    $('#editUserBtn').unbind().click(event => {
+                        var newFName = fName.val();
+                        var newLName = lName.val();
+                        var newSName = sName.val();
+                        var newEmail = email.val();
+                        var newDob = dob.val();
+                        var newNatId = nationalId.val();
+                        var newTel = tel.val();
+                        var newResidence = residence.val();
+                        var newAddress = address.val();
+                        var newGender = $('#empEditForm').find('#gender option:selected').text();
+                        var newDoh = doh.val();
+                        var newStatus = $('#empEditForm').find('#status option:selected').text();
+                        var editStatus;
+                        switch (newStatus) {
+                            case "Active":
+                                editStatus = true;
+                                break;
+                            case "Inactive":
+                                editStatus = false;
+                                break;
+                        }
+                        var newEmpDetails = {
+                            "Firstname": newFName,
+                            "Lastname": newLName,
+                            "Surname": newSName,
+                            "Email": newEmail,
+                            "DateOfBirth": newDob,
+                            "NationalID": newNatId,
+                            "MobilePhoneNumber": newTel,
+                            "Residence": newResidence,
+                            "Address": newAddress,
+                            "Gender": newGender,
+                            "DateOfHire": newDoh,
+                            "Status": editStatus
+                        };
+                        var editResponse = ipc.sendSync('edit-employee', [natId, newEmpDetails]);
+                        if (editResponse.status == true) {
+                            $(document).ready(function () {
+                                $('.modal').modal('close');
+                                var empData = editResponse.message;
+                                var linkToRemove = document.getElementById(natId);
+                                linkToRemove.parentNode.removeChild(linkToRemove);
+                                var li = createEmployeeLi(empData);
+                                const empList = document.getElementById('empList');
+                                empList.appendChild(li);
+                                $('#empEditForm').trigger('reset');
+                                M.toast({ html: editResponse.message.Firstname + '\'s details successfuly edited', classes: 'rounded green toast-head' });
+                                natId = '';
+                                className = '';
+                            });
+                        }else {
+                            M.toast({ html: editResponse.message, classes: 'rounded red toast-head' });
+                            natId = '';
+                            className = '';
+                        }
+                    });
+                }
+            }else if(parentId == 'deleteDepFab'){
+                const reply = ipc.sendSync('get-department', natId);
+                $('#empToDeleteName').html(reply.message.Name);
+                $('#deleteUser').unbind().click(()=>{
+                    var delReply = executeDelete('delete-department', natId);
+                    if(delReply.status == true){
+                        $('#'+natId).empty();
+                        M.toast({ html: delReply.message, classes: 'rounded green toast-head' });
+                        $('#empToDeleteName').html('');
+                        natId = '';
+                        className = '';
+                    }else {
+                        M.toast({ html: delReply.message, classes: 'rounded red toast-head' });
+                        natId = '';
+                        className = '';
+                    }
+                });
+            }
+        }else{
+            natId = '';
+            className = '';
         }
-    });
 });
 
 $('#printEmployee').click( e => {
@@ -441,7 +507,10 @@ $('#saveDept').unbind().click(e => {
             }
         }
     }else {
-        M.toast({ html: "The form cannot be submitted at the moment", classes: 'rounded red toast-head' });
+        M.toast({ html: "Please fix the errors in the form before saving", classes: 'rounded red toast-head' });
+        for (var j = 0, length = formValidation.errors.length; j < length; j++) {
+            M.toast({ html: formValidation.errors[j], classes: 'rounded red black-text' });
+        }
     }
 });
 $('#cancelDept').unbind().click(e => {
@@ -475,7 +544,7 @@ function createDepartmentLiData(args){
             direction: 'left'
         });
     });
-    var btnDiv = createFloatingBtn(args._id);
+    var btnDiv = createFloatingBtn(args._id, 'deleteDepFab');
     row.append(btnDiv);
     cols.forEach((col) => {
         row.append(col);
@@ -519,7 +588,7 @@ function createDepUlData(args) {
                 direction: 'left'
             });
         });
-        row.append(createFloatingBtn(department._id));
+        row.append(createFloatingBtn(department._id, 'deleteDepFab'));
 
         cols.forEach(col => {
             row.append(col);

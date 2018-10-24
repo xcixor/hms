@@ -88,9 +88,17 @@ router.get('/employee/:nationalId', (req, res) => {
 router.put('/employee/:nationalId', (req, res) => {
     Employee.findOneAndUpdate({ NationalID: req.params.nationalId }, req.body, { new: true, upsert: true, setDefaultsOnInsert: true}, (err, employee) => {
         if(err){
-            res.status(500).send({'status': false, 'message': err});
+            if (Object.keys(err).length === 0) {
+                res.status(404).send({ 'status': true, 'message': "That user does not exist" });
+            } else {
+                Object.keys(err.errors).forEach(key => {
+                    accountErrors.push(err.errors[key].message);
+                });
+                res.status(400).send({ 'status': false, 'message': accountErrors });
+            }
+        }else {
+            res.status(201).send({ 'status': true, 'message': employee });
         }
-        res.status(201).send({ 'status': true, 'message': employee });
     });
 });
 
@@ -242,6 +250,35 @@ router.get('/departments', (req, res) => {
             res.status(400).send(err);
         }
         res.status(200).send(departments);
+    });
+});
+
+router.delete('/department/:_id', (req, res) => {
+    Department.findByIdAndRemove(req.params._id, (err, department) => {
+        if (err) {
+            res.status(500).send({ 'status': false, 'message': 'Operation for that department is currently unsuccessful', 'error': err });
+        } else {
+            if (department != null) {
+                res.status(200).send({ 'status': true, 'message': 'Successfuly deleted ' + department.Name });
+            } else {
+                res.status(404).send({ 'status': false, 'message': 'Department not found' });
+            }
+        }
+    });
+
+});
+
+router.get('/department/:_id', (req, res) => {
+    Department.findById(req.params._id, (err, department) => {
+        if (err) {
+            res.status(500).send({ 'status': false, 'message': err });
+        } else {
+            if (department) {
+                res.send({ 'status': true, 'message': department});
+            } else {
+                res.send({ 'status': false, 'message': 'Department not found' });
+            }
+        }
     });
 });
 

@@ -4,6 +4,7 @@
     <link type="text/css" rel="stylesheet" href="../../node_modules/materialize-css/dist/css/materialize.css" media="screen,projection" />
     <link type="text/css" rel="stylesheet" href="../templates-css/hr_dashboard.css" media="screen,projection" />
     <link type="text/css" rel="stylesheet" href="../font-awesome/css/all.css" />
+    <link type="text/css" rel="stylesheet" href="../templates-css/styles.css">
 </head>
 <body>
     <div class="content">
@@ -15,7 +16,7 @@
         <div class="container" id="main-content">
             <div class="row employees" id="employees">
                <div class="row">
-                   <h5 class="center">Employees Currently Registered</h5>
+                   <h5>Employees Currently Registered</h5>
                </div>
             </div>
             <div class="row departments">
@@ -73,28 +74,25 @@
                                 <img src="images/office.jpg">
                             </div>
                             <a href="#user"><img class="circle" src="../assets/user_images/back6.jpeg"></a>
-                            <a href="#name"><span class="white-text name">Admin</span></a>
+                            <a href="#name"><span class="white-text name">hrdmin</span></a>
                             <a href="#email"><span class="white-text email">jdandturk@gmail.com</span></a>
                         </div>
                     </li>
                     <li><a class="subheader red-text">Account Actions</a></li>
                     <li><a class="waves-effect white-text modal-trigger" href="#addUser" id="createUserBtn">Add Employee</a></li>
                     <li><a class="waves-effect white-text" href="#!">View an Employee details</a></li>
-                    <li><a class="waves-effect white-text" href="#!">Update an Employee Details</a></li>
-                    <li><a class="waves-effect white-text" href="#!">Delete an Employee Details</a></li>
                     <li>
                         <div class="divider"></div>
                     </li>
                     <li><a class="subheader red-text">Department Actions</a></li>
                     <li><a class="waves-effect white-text modal-trigger" href="#departmentModal" id="openDeptModal">Create A Department</a></li>
                     <li><a class="waves-effect white-text" href="#!">View A Department Details</a></li>
-                    <li><a class="waves-effect white-text" href="#!">Update A Department Details</a></li>
-                    <li><a class="waves-effect white-text" href="#!">Delete A Department</a></li>
                     <li>
                         <div class="divider"></div>
                     </li>
                     <li><a class="subheader red-text">Reports</a></li>
                     <li><a class="waves-effect white-text" href="#!" id="printEmployee">Print all Employees</a></li>
+                    <li><a class="waves-effect white-text" href="#!" id="printEmployee">Print all Departments</a></li>
                 </ul>
             </div>
             <div class="row confirmModalRow" id="confirmModalRow">
@@ -104,8 +102,14 @@
                     <h6><b>Are you sure you want to delete <span id="empToDeleteName"></span></b></h6>
                 </div>
                 <div class="modal-footer">
-                    <a href="#!" class="modal-close waves-effect waves-green btn">No</a>
-                    <a href="#!" class="modal-close waves-effect waves-green btn" id="deleteUser">Yes</a>
+                    <div class="row">
+                        <div class="col s6">
+                            <a href="#!" class="modal-close waves-effect waves-green btn">No</a>
+                        </div>
+                        <div class="col s6">
+                            <a href="#!" class="modal-close waves-effect waves-green btn" id="deleteUser">Yes</a>
+                        </div>
+                    </div>
                 </div>
                 </div>
             </div>
@@ -196,8 +200,14 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a href="#!" class="modal-close waves-effect waves-green btn" id="cancelBtn">CANCEL</a>
-                        <a href="#!" class="waves-effect waves-green btn" id="saveUserBtn">SAVE</a>
+                        <div class="row">
+                            <div class="col s6">
+                                <a href="#!" class="modal-close waves-effect waves-green btn" id="cancelBtn">CANCEL</a>
+                            </div>
+                            <div class="col s6">
+                                <a href="#!" class="waves-effect waves-green btn" id="saveUserBtn">SAVE</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -220,7 +230,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="input-field col s6">
-                                        <input id="email" type="email">
+                                        <input id="email" type="email" placeholder="Email">
                                     </div>
                                     <div class="input-field col s6">
                                         <input id="dob" type="text" class="datepicker" placeholder="Date of Birth" class="validate">
@@ -231,15 +241,15 @@
                                         <input id="national_id" type="text">
                                     </div>
                                     <div class="input-field col s6">
-                                        <input id="tel" type="text">
+                                        <input id="tel" type="text" placeholder="Telephone">
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="input-field col s6">
-                                        <input id="residence" type="text">
+                                        <input id="residence" type="text" placeholder="Residence">
                                     </div>
                                     <div class="input-field col s6">
-                                        <input id="address" type="text">
+                                        <input id="address" type="text" placeholder="Address">
                                     </div>
                                 </div>
                                 <div class="row">
@@ -271,8 +281,14 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a href="#!" class="modal-close waves-effect waves-green btn" id="cancelBtn">CANCEL</a>
-                        <a href="#!" class="waves-effect waves-green btn" id="editUserBtn">SAVE</a>
+                        <div class="row">
+                            <div class="col s6">
+                                <a href="#!" class="modal-close waves-effect waves-green btn" id="cancelBtn">CANCEL</a>
+                            </div>
+                            <div class="col s6">
+                                <a href="#!" class="waves-effect waves-green btn" id="editUserBtn">SAVE</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
