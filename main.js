@@ -240,7 +240,6 @@ ipc.on('delete-employee', (event, args)=>{
 ipc.on('edit-employee', (event, args) => {
     var xhr = new XMLHttpRequest();
     var url = 'http://localhost:8000/api/employee/' + args[0];
-    console.log(url);
     xhr.open('PUT', url, true);
     //Send the proper header information along with the request
     xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
@@ -296,7 +295,6 @@ ipc.on('get-account', (event, args) => {
 ipc.on('edit-account', (event, args) => {
     var xhr = new XMLHttpRequest();
     var url = 'http://localhost:8000/api/user/' + args[0];
-    console.log(url);
     xhr.open('PUT', url, true);
     //Send the proper header information along with the request
     xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
@@ -328,7 +326,6 @@ ipc.on('delete-account', (event, args) => {
 });
 
 ipc.on('create-department', (event, args) => {
-    console.log(args + 'args');
     var xhr = new XMLHttpRequest();
     var url = 'http://localhost:8000/api/departments';
     xhr.open('POST', url, true);
@@ -343,4 +340,31 @@ ipc.on('create-department', (event, args) => {
     //Send the proper header information along with the request
     xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
     xhr.send(JSON.stringify(args));
+});
+
+ipc.on('get-department', (event, args) => {
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/department/' + args;
+    xhr.addEventListener("load", () => {
+        var data = JSON.parse(xhr.responseText);
+        event.returnValue = data;
+    });
+    xhr.open('GET', url);
+    xhr.send();
+});
+
+ipc.on('delete-department', (event, args) => {
+    var xhr = new XMLHttpRequest();
+    var url = 'http://localhost:8000/api/department/' + args;
+    xhr.addEventListener("load", () => {
+        if (xhr.status == 200 || xhr.status == 500) {
+            var data = JSON.parse(xhr.responseText);
+            event.returnValue = data;
+        } else {
+            event.returnValue = { 'status': false, 'message': 'Error can not delete' };
+        }
+
+    });
+    xhr.open('DELETE', url);
+    xhr.send();
 });

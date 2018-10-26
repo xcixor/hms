@@ -491,7 +491,6 @@ describe('Test post department route', ()=> {
                 done();
             });
         });
-        done();
     });
     it('should not create a department without all the details', done =>{
         var testDept = {
@@ -571,6 +570,45 @@ describe('Test post department route', ()=> {
                 res.body.should.have.property('status').eql(false);
                 res.body.should.have.property('message').
                     eql(['A department with a similar name is already created']);
+                done();
+            });
+    });
+});
+
+describe('Test the delete department route', () => {
+    var depId;
+
+    before(done => {
+        var hod = new Employee(testEmployee);
+        hod.save().then(() => {
+            var deleteDep = new Department(department);
+            deleteDep.save((err, saved) => {
+                depId = saved._id;
+                done();
+            });
+        });
+    });
+    after(done => {
+        Employee.deleteMany({}).then(()=>{
+            done();
+        });
+    });
+
+    it('should delete a department successfuly', done => {
+        chai.request(server).del('/api/department/' + depId).
+            end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.have.property('status').eql(true);
+                res.body.should.have.property('message').eql('Successfuly deleted Human Resource');
+                done();
+            });
+    });
+    it('should not crash if account is unavailable', done => {
+        chai.request(server).del('/api/department/' + 1243434).
+            end((err, res) => {
+                res.should.have.status(500);
+                res.body.should.have.property('status').eql(false);
+                res.body.should.have.property('message').eql('Operation for that department is currently unsuccessful');
                 done();
             });
     });

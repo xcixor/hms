@@ -1,6 +1,7 @@
 nav {
     height: 100px;
     line-height: 100px;
+    background-color: #000010 !important;
 }
 
 .container {
@@ -23,6 +24,10 @@ nav {
     line-height: 225px;
 }
 
+button {
+    background: #000020 !important;
+}
+
 ul li {
     display: inline;
 }
@@ -39,6 +44,7 @@ li {
 .vertical-line {
     border-right: solid 1px;
 }
+
 .btn {
     width: 100%;
 }
