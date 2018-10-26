@@ -86,15 +86,18 @@ router.get('/employee/:nationalId', (req, res) => {
 });
 
 router.put('/employee/:nationalId', (req, res) => {
-    Employee.findOneAndUpdate({ NationalID: req.params.nationalId }, req.body, { new: true, upsert: true, setDefaultsOnInsert: true}, (err, employee) => {
+    var empErrors = [];
+    var opts = { new: true, upsert: false, setDefaultsOnInsert: true, runValidators: true };
+    Employee.findOneAndUpdate({ NationalID: req.params.nationalId }, req.body, opts, (err, employee) => {
         if(err){
             if (Object.keys(err).length === 0) {
-                res.status(404).send({ 'status': true, 'message': "That user does not exist" });
+                empErrors.push("That user does not exist");
+                res.status(404).send({ 'status': false, 'message': empErrors});
             } else {
                 Object.keys(err.errors).forEach(key => {
-                    accountErrors.push(err.errors[key].message);
+                    empErrors.push(err.errors[key].message);
                 });
-                res.status(400).send({ 'status': false, 'message': accountErrors });
+                res.status(400).send({ 'status': false, 'message': empErrors});
             }
         }else {
             res.status(201).send({ 'status': true, 'message': employee });
