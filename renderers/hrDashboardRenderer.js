@@ -6,6 +6,7 @@ var jsPDF = require('jspdf');
 require('jspdf-autotable');
 
 $(document).ready(function () {
+    $('select').formSelect();
     ipc.send('retrieve-employees');
     setTimeout(()=>{
         ipc.send('retrieve-departments');
@@ -77,9 +78,6 @@ ipc.on('receive-employees', (event, args) => {
 
 });
 
-// ipc.on('reload-employees', (event, args) =>{
-//     ipc.send('retrieve-employees');
-// });
 
 function createEmployeeLi(args){
     var empNodes = [];
@@ -354,9 +352,11 @@ $(".content").on('click', 'i' , event => {
                                 className = '';
                             });
                         }else {
-                            M.toast({ html: editResponse.message, classes: 'rounded red toast-head' });
-                            natId = '';
-                            className = '';
+                            console.log(editResponse);
+                            M.toast({ html: "There are errors in the form, Please check ther errors below", classes: 'rounded red toast-head' });
+                            for (var i = 0, len = editResponse.message.length; i < len; i++) {
+                                M.toast({ html: editResponse.message[i], classes: 'rounded red black-text' });
+                            }
                         }
                     });
                 }
